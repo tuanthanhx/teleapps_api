@@ -48,7 +48,7 @@ exports.validateTelegramInitData = (initData) => {
   const authDate = parseInt(parsedData.get('auth_date'), 10);
   const currentTime = Math.floor(Date.now() / 1000);
   const maxAllowedAge = 86400; // 1 day in seconds
-  if (currentTime - authDate > maxAllowedAge) {
+  if (currentTime - authDate > maxAllowedAge && process.env.NODE_ENV !== 'development') {
     console.log('Auth date is too old');
     return null; // Validation failed
   }

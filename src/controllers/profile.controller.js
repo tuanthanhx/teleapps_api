@@ -1,5 +1,3 @@
-const crypto = require('crypto');
-const { v4: uuidv4 } = require('uuid');
 const logger = require('../utils/logger');
 const db = require('../models');
 
@@ -36,40 +34,106 @@ module.exports = {
       try {
         const { id: userId } = req.user;
 
-        const userGame = await db.user_game.findOne({
-          where: {
-            userId,
-          },
-        });
+        const {
+          username,
+          firstName,
+          lastName,
+          email,
+          phone,
+          avatar,
+          gender,
+          dob,
+        } = req.body;
 
-        if (!userGame) {
+        const me = await db.user.findByPk(userId);
+        if (!me) {
           res.status(404).send({
-            message: 'User Game Data not found',
+            message: 'User not found',
           });
           return;
         }
 
-        if (userGame.playCount <= 0) {
-          res.status(400).send({
-            message: 'No play counts available',
+        const object = {};
+
+        if (username) {
+          const duplicateUsername = await db.user.findOne({
+            where: {
+              username,
+              id: { [db.Sequelize.Op.ne]: userId },
+            },
           });
-          return;
+
+          if (duplicateUsername) {
+            res.status(409).send({
+              message: 'Username already in use by another user',
+            });
+            return;
+          }
+
+          object.username = username;
         }
 
-        const sessionHash = crypto.createHash('md5').update(uuidv4()).digest('hex');
+        if (email) {
+          const duplicateEmail = await db.user.findOne({
+            where: {
+              email,
+              id: { [db.Sequelize.Op.ne]: userId },
+            },
+          });
 
-        const headersString = `${userId}${sessionHash}${req.headers['user-agent']}${req.headers['sec-ch-ua']}${req.headers['sec-ch-ua-mobile']}${req.headers['sec-ch-ua-platform']}${req.headers.host}${req.headers.origin}${req.headers['sec-fetch-site']}${req.headers['sec-fetch-mode']}${req.headers['sec-fetch-dest']}${req.headers['accept-encoding']}${req.headers['accept-language']}`;
-        const sessionSecret = crypto.createHash('md5').update(headersString).digest('hex');
+          if (duplicateEmail) {
+            res.status(409).send({
+              message: 'Email already in use by another user',
+            });
+            return;
+          }
 
-        userGame.playCount -= 1;
-        userGame.session = sessionHash;
-        userGame.sessionSecret = sessionSecret;
-        await userGame.save();
+          object.email = email;
+        }
+
+        if (phone) {
+          const duplicatePhone = await db.user.findOne({
+            where: {
+              phone,
+              id: { [db.Sequelize.Op.ne]: userId },
+            },
+          });
+
+          if (duplicatePhone) {
+            res.status(409).send({
+              message: 'Phone already in use by another user',
+            });
+            return;
+          }
+
+          object.phone = phone;
+        }
+
+        if (firstName !== undefined) {
+          object.firstName = firstName;
+        }
+
+        if (lastName !== undefined) {
+          object.lastName = lastName;
+        }
+
+        if (avatar !== undefined) {
+          object.avatar = avatar;
+        }
+
+        if (gender) {
+          object.gender = gender;
+        }
+
+        if (dob) {
+          object.dob = dob;
+        }
+
+        await me.update(object);
 
         res.json({
           data: {
-            remainPlayCount: userGame.playCount,
-            session: sessionHash,
+            message: 'Profile updated successfully',
           },
         });
       } catch (err) {

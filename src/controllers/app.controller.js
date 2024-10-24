@@ -1,4 +1,4 @@
-const appService = require('../services/app');
+const appService = require('../services/app.service');
 const logger = require('../utils/logger');
 const { APP_PLATFORMS } = require('../constants/app_platform.constants');
 const { APP_SNS } = require('../constants/app_sns.constants');

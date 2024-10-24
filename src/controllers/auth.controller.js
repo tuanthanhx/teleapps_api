@@ -68,6 +68,13 @@ module.exports = {
           return;
         }
 
+        if (validatedData.user.is_bot) {
+          res.status(403).json({
+            message: 'Bot is not allowed',
+          });
+          return;
+        }
+
         const tmpPassword = generateRandomNumber(6);
 
         const object = {

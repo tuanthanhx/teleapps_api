@@ -39,6 +39,6 @@ exports.getReviewStatistics = async (appId) => {
     };
   } catch (err) {
     logger.error(err);
-    return false;
+    throw err;
   }
 };

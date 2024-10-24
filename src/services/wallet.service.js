@@ -8,7 +8,7 @@ exports.createWallet = async (userId) => {
   try {
     if (!userId) {
       logger.error('userId is required');
-      return false;
+      throw new Error('userId is required');
     }
 
     const object = {
@@ -29,6 +29,6 @@ exports.createWallet = async (userId) => {
     return wallet || createdWallet;
   } catch (err) {
     logger.error(err);
-    return false;
+    throw err;
   }
 };

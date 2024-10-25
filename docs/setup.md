@@ -17,6 +17,7 @@ NODE_ENV=production npx sequelize db:seed --seed 20240901000008-add_app_reviews.
 NODE_ENV=production npx sequelize db:seed --seed 20240901000009-add_sliders.js
 NODE_ENV=production npx sequelize db:seed --seed 20240901000010-add_slider_items.js
 NODE_ENV=production npx sequelize db:seed --seed 20240901000011-add_app_category_slider_items.js
+NODE_ENV=production npx sequelize db:seed --seed 20241026000015-add_wallets.js
 
 
 # MIGRATION

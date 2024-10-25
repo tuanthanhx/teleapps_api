@@ -7,6 +7,7 @@ module.exports = (app) => {
   const apiVersion = process.env.VERSION || 'v1';
 
   router.get('/', wallets.user.getWallets);
+  router.get('/logs', wallets.user.getLogs);
 
   app.use(`/api-user/${apiVersion}/wallets`, router);
 };

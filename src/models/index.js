@@ -47,6 +47,9 @@ db.user_session.belongsTo(db.user);
 db.user.hasOne(db.wallet, { onDelete: 'CASCADE' });
 db.wallet.belongsTo(db.user);
 
+db.wallet.hasMany(db.wallet_log, { onDelete: 'CASCADE' });
+db.wallet_log.belongsTo(db.wallet);
+
 db.app.belongsTo(db.app_category, { as: 'category', foreignKey: 'appCategoryId' });
 db.app_category.hasMany(db.app);
 

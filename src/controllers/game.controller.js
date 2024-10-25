@@ -35,7 +35,7 @@ module.exports = {
           playCount: 1000000,
         };
 
-        const [userGame, createdUserGame] = await db.user_game.findOrCreate({
+        const [userGame] = await db.user_game.findOrCreate({
           where: {
             userId,
           },
@@ -44,7 +44,7 @@ module.exports = {
 
         res.json({
           data: {
-            playCount: userGame?.playCount || createdUserGame?.playCount,
+            playCount: userGame?.playCount,
           },
         });
       } catch (err) {

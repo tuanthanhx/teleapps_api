@@ -80,8 +80,6 @@ exports.calculateInvitationReward = (count) => {
   const scaleTon = 0.0002;
   const scaleCoin = 100;
 
-  console.log(inviteCount);
-
   const rangeMultiplier = inviteCount <= 100 ? Math.min(Math.floor((inviteCount - 1) / 10), 9) : 10;
 
   const tonReward = (baseTon + scaleTon * rangeMultiplier).toFixed(4);

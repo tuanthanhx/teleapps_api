@@ -1,7 +1,8 @@
 module.exports = function (sequelize, Sequelize) {
   return sequelize.define('wallet', {
-    address: {
+    id: {
       type: Sequelize.STRING(34),
+      primaryKey: true,
       unique: true,
       allowNull: false,
     },

@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { v4: uuidv4 } = require('uuid');
+const walletService = require('../services/wallet.service');
 const logger = require('../utils/logger');
 const { validateTelegramInitData, calculateInvitationReward } = require('../utils/auth');
 const { generateRandomNumber } = require('../utils/utils');
@@ -91,44 +92,41 @@ module.exports = {
           object.referrerId = referrerId;
         }
 
-        const [user, createdUser] = await db.user.findOrCreate({
+        const [user, isCreatedUser] = await db.user.findOrCreate({
           where: {
             telegramId: validatedData.user.id,
           },
           defaults: object,
         });
 
-        if (createdUser) {
-          // await walletService.createWallet(createdUser.id, 1);
+        const userIdentity = {
+          id: user.id,
+          userGroupId: user.userGroupId,
+        };
+        const accessToken = jwt.sign(userIdentity, accessTokenSecret, { expiresIn: process.env.JWT_ACCESS_EXPIRATION || '15m' });
+        const refreshToken = jwt.sign(userIdentity, refreshTokenSecret, { expiresIn: process.env.JWT_REFRESH_EXPIRATION || '30d' });
+
+        const [token, isCreatedRefreshToken] = await db.user_refresh_token.findOrCreate({
+          where: { userId: user.id },
+          defaults: { token: refreshToken },
+        });
+
+        if (!isCreatedRefreshToken) {
+          await token.update({ token: refreshToken });
+        }
+
+        if (isCreatedUser) {
+          await walletService.createWallet(user.id);
           if (referrer) {
             let inviteCount = await db.user.count({ where: { referrerId } });
             inviteCount++;
             const invitationReward = calculateInvitationReward(inviteCount);
             if (invitationReward) {
-              // console.log(invitationReward);
-              // TODO: Add reward to wallet balance + write transaction logs
-              // invitationReward.tonReward
-              // invitationReward.coinReward
+              await walletService.put(user.id, 1000, 'coin', 'Registration Reward');
+              await walletService.put(referrer.id, invitationReward.tonReward, 'ton', 'Invitation Reward');
+              await walletService.put(referrer.id, invitationReward.coinReward, 'coin', 'Invitation Reward');
             }
           }
-        }
-
-        const userData = user || createdUser;
-
-        const userIdentity = {
-          id: userData.id,
-          userGroupId: userData.userGroupId,
-        };
-        const accessToken = jwt.sign(userIdentity, accessTokenSecret, { expiresIn: process.env.JWT_ACCESS_EXPIRATION || '15m' });
-        const refreshToken = jwt.sign(userIdentity, refreshTokenSecret, { expiresIn: process.env.JWT_REFRESH_EXPIRATION || '30d' });
-
-        const [token, createdToken] = await db.user_refresh_token.findOrCreate({
-          where: { userId: userData.id },
-          defaults: { token: refreshToken },
-        });
-
-        if (!createdToken) {
-          await token.update({ token: refreshToken });
         }
 
         res.json({
@@ -181,12 +179,12 @@ module.exports = {
         const accessToken = jwt.sign(userIdentity, accessTokenSecret, { expiresIn: process.env.JWT_ACCESS_EXPIRATION || '15m' });
         const refreshToken = jwt.sign(userIdentity, refreshTokenSecret, { expiresIn: process.env.JWT_REFRESH_EXPIRATION || '30d' });
 
-        const [token, createdToken] = await db.user_refresh_token.findOrCreate({
+        const [token, isCreated] = await db.user_refresh_token.findOrCreate({
           where: { userId: userData.id },
           defaults: { token: refreshToken },
         });
 
-        if (!createdToken) {
+        if (!isCreated) {
           await token.update({ token: refreshToken });
         }
 
@@ -210,7 +208,7 @@ module.exports = {
           session: sessionHash,
         };
 
-        const [session, createdSession] = await db.user_session.findOrCreate({
+        const [session] = await db.user_session.findOrCreate({
           where: { userId },
           defaults: object,
         });
@@ -220,7 +218,7 @@ module.exports = {
         }
 
         res.json({
-          data: session?.session || createdSession?.session,
+          data: session?.session,
         });
       } catch (err) {
         logger.error(err);

@@ -15,6 +15,9 @@ module.exports = function (sequelize, Sequelize) {
       type: Sequelize.STRING,
       unique: true,
     },
+    telegramPremium: {
+      type: Sequelize.BOOLEAN,
+    },
     userGroupId: {
       type: Sequelize.INTEGER,
       allowNull: false,

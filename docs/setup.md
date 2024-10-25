@@ -23,6 +23,7 @@ NODE_ENV=production npx sequelize db:seed --seed 20240901000011-add_app_category
 
 npx sequelize-cli db:migrate --env production
 npx sequelize-cli db:migrate --to 00000000000000-sample.js --env production
+npx sequelize-cli db:migrate --to 20241025231113-add-columns-to-users.js --env production
 
 
 TEST:

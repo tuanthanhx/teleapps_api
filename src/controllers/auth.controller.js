@@ -83,7 +83,9 @@ module.exports = {
           firstName: validatedData.user.first_name,
           lastName: validatedData.user.last_name,
           username: validatedData.user.username,
+          telegramPremium: Boolean(validatedData.user.is_premium),
           userGroupId: 1,
+          lastLogin: new Date(),
           referrerId,
         };
 
@@ -123,10 +125,22 @@ module.exports = {
             const invitationReward = calculateInvitationReward(inviteCount);
             if (invitationReward) {
               await walletService.put(user.id, 1000, 'coin', 'Registration Reward');
-              await walletService.put(referrer.id, invitationReward.tonReward, 'ton', 'Invitation Reward');
-              await walletService.put(referrer.id, invitationReward.coinReward, 'coin', 'Invitation Reward');
+
+              const tonReward = validatedData.user.is_premium ? invitationReward.tonReward * 2 : invitationReward.tonReward;
+              const coinReward = validatedData.user.is_premium ? invitationReward.coinReward * 2 : invitationReward.coinReward;
+              const rewardDescription = validatedData.user.is_premium ? 'Invitation Reward (Premium)' : 'Invitation Reward';
+
+              await walletService.put(referrer.id, tonReward, 'ton', rewardDescription);
+              await walletService.put(referrer.id, coinReward, 'coin', rewardDescription);
             }
           }
+        } else {
+          const isPremium = Boolean(validatedData.user.is_premium);
+          if (user.telegramPremium !== isPremium) {
+            user.telegramPremium = isPremium;
+          }
+          user.lastLogin = new Date();
+          await user.save();
         }
 
         res.json({

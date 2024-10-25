@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { v4: uuidv4 } = require('uuid');
 const logger = require('../utils/logger');
-const { validateTelegramInitData } = require('../utils/auth');
+const { validateTelegramInitData, calculateInvitationReward } = require('../utils/auth');
 const { generateRandomNumber } = require('../utils/utils');
 const db = require('../models');
 
@@ -86,6 +86,11 @@ module.exports = {
           referrerId,
         };
 
+        const referrer = referrerId ? await db.user.findOne({ where: { telegramId: referrerId } }) : null;
+        if (referrer) {
+          object.referrerId = referrerId;
+        }
+
         const [user, createdUser] = await db.user.findOrCreate({
           where: {
             telegramId: validatedData.user.id,
@@ -93,9 +98,20 @@ module.exports = {
           defaults: object,
         });
 
-        // if (createdUser) {
-        //   await walletService.createWallet(createdUser.id, 1);
-        // }
+        if (createdUser) {
+          // await walletService.createWallet(createdUser.id, 1);
+          if (referrer) {
+            let inviteCount = await db.user.count({ where: { referrerId } });
+            inviteCount++;
+            const invitationReward = calculateInvitationReward(inviteCount);
+            if (invitationReward) {
+              // console.log(invitationReward);
+              // TODO: Add reward to wallet balance + write transaction logs
+              // invitationReward.tonReward
+              // invitationReward.coinReward
+            }
+          }
+        }
 
         const userData = user || createdUser;
 

@@ -58,7 +58,7 @@ module.exports = {
     },
     loginByTelegram: async (req, res) => {
       try {
-        const { initData, referrerId } = req.body;
+        const { initData } = req.body;
 
         const validatedData = validateTelegramInitData(initData);
 
@@ -76,6 +76,11 @@ module.exports = {
           return;
         }
 
+        let referrerId = null;
+        if (validatedData.start_param && validatedData.start_param.startsWith('ref_')) {
+          referrerId = validatedData.start_param.replace('ref_', '').trim();
+        }
+
         const tmpPassword = generateRandomNumber(6);
 
         const object = {
@@ -86,7 +91,6 @@ module.exports = {
           telegramPremium: Boolean(validatedData.user.is_premium),
           userGroupId: 1,
           lastLogin: new Date(),
-          referrerId,
         };
 
         const referrer = referrerId ? await db.user.findOne({ where: { telegramId: referrerId } }) : null;

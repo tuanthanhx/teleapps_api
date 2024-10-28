@@ -76,6 +76,9 @@ db.game_session.belongsTo(db.user);
 db.user.hasMany(db.user_game, { onDelete: 'CASCADE' });
 db.user_game.belongsTo(db.user);
 
+db.user_task.belongsTo(db.task);
+db.user_task.belongsTo(db.user);
+
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 

@@ -6,7 +6,7 @@ const apiVersion = process.env.VERSION || 'v1';
 
 const accessTokenSecret = process.env.JWT_ACCESS_SECRET;
 
-exports.authenticateToken = (req, res, next) => {
+exports.verifyToken = (req, res, next) => {
   const publicPaths = [
     '/favicon.ico',
     '/public',

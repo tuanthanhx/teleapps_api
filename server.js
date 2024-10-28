@@ -8,7 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const logger = require('./src/utils/logger');
 const morganMiddleware = require('./src/middlewares/morgan');
-const { authenticateToken } = require('./src/middlewares/authenticate_token');
+const { verifyToken } = require('./src/middlewares/auth');
 const { handleQueries, validateRules } = require('./src/middlewares/validators');
 const db = require('./src/models');
 
@@ -39,7 +39,7 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParserErrorHandler());
-app.use(authenticateToken);
+app.use(verifyToken);
 app.use([handleQueries, validateRules]);
 
 db.sequelize.sync()

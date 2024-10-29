@@ -22,8 +22,10 @@ module.exports = function (sequelize, Sequelize) {
     sessionSecret: {
       type: Sequelize.STRING,
     },
+    claimedAt: {
+      type: Sequelize.DATE,
+    },
   }, {
     paranoid: false,
-    initialAutoIncrement: 1000,
   });
 };

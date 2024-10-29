@@ -8,6 +8,7 @@ module.exports = (app) => {
 
   router.get('/', tasks.user.index);
   router.get('/:id', tasks.user.show);
+  router.post('/:id/start', tasks.user.start);
 
   app.use(`/api-user/${apiVersion}/tasks`, router);
 };

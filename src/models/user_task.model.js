@@ -10,6 +10,10 @@ module.exports = function (sequelize, Sequelize) {
       defaultValue: Sequelize.UUIDV4,
       allowNull: false,
     },
+    points: {
+      type: Sequelize.DECIMAL(30, 8),
+      defaultValue: 0.00000000,
+    },
     status: {
       type: Sequelize.INTEGER,
     },

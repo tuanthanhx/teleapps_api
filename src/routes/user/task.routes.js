@@ -9,6 +9,8 @@ module.exports = (app) => {
   router.get('/', tasks.user.index);
   router.get('/:id', tasks.user.show);
   router.post('/:id/start', tasks.user.start);
+  router.post('/:id/submit', tasks.user.submit);
+  router.post('/:id/claim', tasks.user.claim);
 
   app.use(`/api-user/${apiVersion}/tasks`, router);
 };

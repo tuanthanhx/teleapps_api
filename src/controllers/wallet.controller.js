@@ -2,6 +2,8 @@ const walletService = require('../services/wallet.service');
 const logger = require('../utils/logger');
 const db = require('../models');
 
+const { Op } = db.Sequelize;
+
 module.exports = {
   user: {
     getWallets: async (req, res) => {
@@ -41,6 +43,8 @@ module.exports = {
         const { id: userId } = req.user;
 
         const {
+          keyword,
+          unit,
           page,
           limit,
           sortField,
@@ -64,6 +68,16 @@ module.exports = {
         const condition = {
           walletId: wallet.id,
         };
+
+        if (keyword) {
+          condition[Op.or] = [
+            { message: { [Op.like]: `%${keyword}%` } },
+          ];
+        }
+
+        if (unit) {
+          condition.unit = unit;
+        }
 
         let ordering = [['createdAt', 'DESC']];
 

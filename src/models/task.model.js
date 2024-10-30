@@ -21,6 +21,9 @@ module.exports = function (sequelize, Sequelize) {
       type: Sequelize.STRING,
       allowNull: false,
     },
+    data: {
+      type: Sequelize.JSON,
+    },
     isDaily: {
       type: Sequelize.BOOLEAN,
       defaultValue: false,

@@ -5,7 +5,7 @@ module.exports = {
         {
           name: 'Share $DUCK game',
           description: null,
-          points: 100,
+          rewards: { coin: 100, ticket: 2 },
           type: 'link',
           data: { url: '#' },
           isDaily: false,
@@ -14,7 +14,7 @@ module.exports = {
         {
           name: 'Follow TeleApps on X',
           description: null,
-          points: 100,
+          rewards: { coin: 100, ticket: 2 },
           type: 'link',
           data: { url: '#' },
           isDaily: false,
@@ -23,7 +23,7 @@ module.exports = {
         {
           name: 'Join TeleApps Channel',
           description: null,
-          points: 100,
+          rewards: { coin: 100, ticket: 2 },
           type: 'link',
           data: { url: '#' },
           isDaily: false,
@@ -32,7 +32,7 @@ module.exports = {
         {
           name: 'Join TeleApps Community',
           description: null,
-          points: 100,
+          rewards: { coin: 100, ticket: 2 },
           type: 'link',
           data: { url: '#' },
           isDaily: false,
@@ -45,7 +45,7 @@ module.exports = {
           id: Sequelize.literal('UUID()'),
           name: item.name,
           description: item.description,
-          points: item.points,
+          rewards: JSON.stringify(item.rewards),
           type: item.type,
           data: JSON.stringify(item.data),
           isDaily: item.isDaily,

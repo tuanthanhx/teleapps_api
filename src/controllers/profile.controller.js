@@ -109,15 +109,15 @@ module.exports = {
           object.phone = phone;
         }
 
-        if (firstName !== undefined) {
+        if (typeof firstName !== 'undefined') {
           object.firstName = firstName;
         }
 
-        if (lastName !== undefined) {
+        if (typeof lastName !== 'undefined') {
           object.lastName = lastName;
         }
 
-        if (avatar !== undefined) {
+        if (typeof avatar !== 'undefined') {
           object.avatar = avatar;
         }
 

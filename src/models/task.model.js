@@ -13,16 +13,15 @@ module.exports = function (sequelize, Sequelize) {
     description: {
       type: Sequelize.STRING,
     },
-    points: {
-      type: Sequelize.DECIMAL(30, 8),
-      defaultValue: 0.00000000,
+    rewards: {
+      type: Sequelize.JSON, // { ticket, coin, usdt, ton, etc. }
     },
     type: {
-      type: Sequelize.STRING,
+      type: Sequelize.STRING, // Link, Share, Try App, etc.
       allowNull: false,
     },
     data: {
-      type: Sequelize.JSON,
+      type: Sequelize.JSON, // { url, etc. }
     },
     isDaily: {
       type: Sequelize.BOOLEAN,

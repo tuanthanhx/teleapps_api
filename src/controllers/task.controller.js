@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const { v4: uuidv4 } = require('uuid');
 const walletService = require('../services/wallet.service');
+const { tryParseJSON } = require('../utils/utils');
 const logger = require('../utils/logger');
 const db = require('../models');
 
@@ -8,10 +9,20 @@ module.exports = {
   user: {
     index: async (req, res) => {
       try {
+        const {
+          isDaily,
+        } = req.query;
+
+        const condition = {
+          status: 1,
+        };
+
+        if (typeof isDaily !== 'undefined') {
+          condition.isDaily = isDaily;
+        }
+
         const tasks = await db.task.findAll({
-          where: {
-            status: 1,
-          },
+          where: condition,
           order: [['order', 'ASC']],
         });
 
@@ -81,7 +92,6 @@ module.exports = {
           session: sessionHash,
           sessionSecret,
           status: 1,
-          points: task.points,
         };
 
         const [userTask, isCreated] = await db.user_task.findOrCreate({
@@ -218,7 +228,12 @@ module.exports = {
           claimedAt: new Date(),
         });
 
-        await walletService.put(userId, userTask.points, 'coin', `Task Reward - ${task.name}`);
+        const taskRewards = tryParseJSON(task.rewards);
+        for (const [asset, amount] of Object.entries(taskRewards)) {
+          if (amount && amount > 0) {
+            await walletService.put(userId, amount, asset, `Task Reward - ${task.name}`);
+          }
+        }
 
         res.json({
           data: {

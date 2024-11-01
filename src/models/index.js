@@ -79,6 +79,9 @@ db.user_game.belongsTo(db.user);
 db.user_task.belongsTo(db.task);
 db.user_task.belongsTo(db.user);
 
+db.task.belongsTo(db.task_category, { as: 'category', foreignKey: 'taskCategoryId' });
+db.task_category.hasMany(db.task);
+
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 

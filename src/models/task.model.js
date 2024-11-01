@@ -23,10 +23,6 @@ module.exports = function (sequelize, Sequelize) {
     data: {
       type: Sequelize.JSON, // { url, etc. }
     },
-    isDaily: {
-      type: Sequelize.BOOLEAN,
-      defaultValue: false,
-    },
     status: {
       type: Sequelize.INTEGER,
     },

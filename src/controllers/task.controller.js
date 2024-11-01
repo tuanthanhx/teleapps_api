@@ -10,15 +10,15 @@ module.exports = {
     index: async (req, res) => {
       try {
         const {
-          isDaily,
+          taskCategoryId,
         } = req.query;
 
         const condition = {
           status: 1,
         };
 
-        if (typeof isDaily !== 'undefined') {
-          condition.isDaily = isDaily;
+        if (taskCategoryId) {
+          condition.taskCategoryId = taskCategoryId;
         }
 
         const tasks = await db.task.findAll({

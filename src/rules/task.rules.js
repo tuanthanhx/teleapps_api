@@ -4,9 +4,9 @@ const { validateRules } = require('../middlewares/validators');
 module.exports = {
   user: {
     index: [
-      query('isDaily')
+      query('taskCategoryId')
         .optional()
-        .toBoolean(),
+        .toInt(),
       validateRules,
     ],
     show: [

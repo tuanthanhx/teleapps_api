@@ -83,14 +83,14 @@ module.exports = {
           return;
         }
 
-        const sessionHash = crypto.createHash('md5').update(uuidv4()).digest('hex');
+        // const sessionHash = crypto.createHash('md5').update(uuidv4()).digest('hex');
 
-        const headersString = `${userId}${sessionHash}${req.headers['user-agent']}${req.headers['sec-ch-ua']}${req.headers['sec-ch-ua-mobile']}${req.headers['sec-ch-ua-platform']}${req.headers.host}${req.headers.origin}${req.headers['sec-fetch-site']}${req.headers['sec-fetch-mode']}${req.headers['sec-fetch-dest']}${req.headers['accept-encoding']}${req.headers['accept-language']}`;
-        const sessionSecret = crypto.createHash('md5').update(headersString).digest('hex');
+        // const headersString = `${userId}${sessionHash}${req.headers['user-agent']}${req.headers['sec-ch-ua']}${req.headers['sec-ch-ua-mobile']}${req.headers['sec-ch-ua-platform']}${req.headers.host}${req.headers.origin}${req.headers['sec-fetch-site']}${req.headers['sec-fetch-mode']}${req.headers['sec-fetch-dest']}${req.headers['accept-encoding']}${req.headers['accept-language']}`;
+        // const sessionSecret = crypto.createHash('md5').update(headersString).digest('hex');
 
         const object = {
-          session: sessionHash,
-          sessionSecret,
+          // session: sessionHash,
+          // sessionSecret,
           status: 1,
         };
 
@@ -114,9 +114,10 @@ module.exports = {
         }
 
         res.json({
-          data: {
-            session: sessionHash,
-          },
+          data: true,
+          // data: {
+          //   session: sessionHash,
+          // },
         });
       } catch (err) {
         logger.error(err);
@@ -129,7 +130,8 @@ module.exports = {
       try {
         const { id } = req.params;
         const { id: userId } = req.user;
-        const { data, session } = req.body;
+        // const { data, session } = req.body;
+        const { data } = req.body;
 
         const task = await db.task.findOne({
           where: {
@@ -150,7 +152,7 @@ module.exports = {
             userId,
             taskId: task.id,
             status: 1,
-            session,
+            // session,
           },
         });
 
@@ -161,15 +163,15 @@ module.exports = {
           return;
         }
 
-        const headersString = `${userId}${session}${req.headers['user-agent']}${req.headers['sec-ch-ua']}${req.headers['sec-ch-ua-mobile']}${req.headers['sec-ch-ua-platform']}${req.headers.host}${req.headers.origin}${req.headers['sec-fetch-site']}${req.headers['sec-fetch-mode']}${req.headers['sec-fetch-dest']}${req.headers['accept-encoding']}${req.headers['accept-language']}`;
-        const sessionSecret = crypto.createHash('md5').update(headersString).digest('hex');
+        // const headersString = `${userId}${session}${req.headers['user-agent']}${req.headers['sec-ch-ua']}${req.headers['sec-ch-ua-mobile']}${req.headers['sec-ch-ua-platform']}${req.headers.host}${req.headers.origin}${req.headers['sec-fetch-site']}${req.headers['sec-fetch-mode']}${req.headers['sec-fetch-dest']}${req.headers['accept-encoding']}${req.headers['accept-language']}`;
+        // const sessionSecret = crypto.createHash('md5').update(headersString).digest('hex');
 
-        if (userTask.session !== session || userTask.sessionSecret !== sessionSecret) {
-          res.status(400).send({
-            message: 'Use Task Session is not valid',
-          });
-          return;
-        }
+        // if (userTask.session !== session || userTask.sessionSecret !== sessionSecret) {
+        //   res.status(400).send({
+        //     message: 'Use Task Session is not valid',
+        //   });
+        //   return;
+        // }
 
         // TODO: Verify data if needed
 
@@ -179,9 +181,10 @@ module.exports = {
         });
 
         res.json({
-          data: {
-            message: 'User Task submitted successfully',
-          },
+          data: true,
+          // data: {
+          //   message: 'User Task submitted successfully',
+          // },
         });
       } catch (err) {
         logger.error(err);
@@ -236,9 +239,10 @@ module.exports = {
         }
 
         res.json({
-          data: {
-            message: 'User Task claimed successfully',
-          },
+          data: true,
+          // data: {
+          //   message: 'User Task claimed successfully',
+          // },
         });
       } catch (err) {
         logger.error(err);

@@ -14,12 +14,12 @@ module.exports = function (sequelize, Sequelize) {
     data: {
       type: Sequelize.JSON,
     },
-    session: {
-      type: Sequelize.STRING,
-    },
-    sessionSecret: {
-      type: Sequelize.STRING,
-    },
+    // session: {
+    //   type: Sequelize.STRING,
+    // },
+    // sessionSecret: {
+    //   type: Sequelize.STRING,
+    // },
     claimedAt: {
       type: Sequelize.DATE,
     },

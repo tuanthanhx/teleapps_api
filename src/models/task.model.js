@@ -14,6 +14,12 @@ module.exports = function (sequelize, Sequelize) {
       type: Sequelize.STRING, // Link, Share, Try App, etc.
       allowNull: false,
     },
+    repeatInterval: {
+      type: Sequelize.INTEGER,
+    },
+    repeatUnit: {
+      type: Sequelize.ENUM('minute', 'hour', 'day', 'week', 'month', 'year'),
+    },
     data: {
       type: Sequelize.JSON, // { url, etc. }
     },

@@ -5,6 +5,10 @@ module.exports = {
     try {
       const array = [
         {
+          name: 'Special',
+          description: null,
+        },
+        {
           name: 'Hot Today',
           description: null,
         },

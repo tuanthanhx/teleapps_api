@@ -1,5 +1,5 @@
-const crypto = require('crypto');
-const { v4: uuidv4 } = require('uuid');
+// const crypto = require('crypto');
+// const { v4: uuidv4 } = require('uuid');
 const walletService = require('../services/wallet.service');
 const { tryParseJSON } = require('../utils/utils');
 const logger = require('../utils/logger');
@@ -99,6 +99,7 @@ module.exports = {
             userId,
             taskId: task.id,
           },
+          order: [['id', 'DESC']],
           defaults: object,
         });
 
@@ -218,6 +219,7 @@ module.exports = {
             status: 2,
             claimedAt: null,
           },
+          order: [['id', 'DESC']],
         });
 
         if (!userTask) {

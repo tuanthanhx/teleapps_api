@@ -1,11 +1,5 @@
 module.exports = function (sequelize, Sequelize) {
   return sequelize.define('task', {
-    id: {
-      type: Sequelize.STRING,
-      defaultValue: Sequelize.UUIDV4,
-      primaryKey: true,
-      allowNull: false,
-    },
     name: {
       type: Sequelize.STRING,
       allowNull: false,
@@ -31,5 +25,6 @@ module.exports = function (sequelize, Sequelize) {
     },
   }, {
     paranoid: false,
+    initialAutoIncrement: 100,
   });
 };

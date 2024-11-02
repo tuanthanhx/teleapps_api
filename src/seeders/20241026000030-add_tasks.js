@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 module.exports = {
-  async up (queryInterface, Sequelize) {
+  async up (queryInterface) {
     try {
       const array = [
         {
@@ -62,7 +62,6 @@ module.exports = {
       const baseTime = new Date();
       for (const item of array) {
         const object = {
-          id: Sequelize.literal('UUID()'),
           name: item.name,
           description: item.description,
           taskCategoryId: item.taskCategoryId,

@@ -2,12 +2,10 @@ module.exports = function (sequelize, Sequelize) {
   return sequelize.define('user_task', {
     userId: {
       type: Sequelize.STRING,
-      defaultValue: Sequelize.UUIDV4,
       allowNull: false,
     },
     taskId: {
-      type: Sequelize.STRING,
-      defaultValue: Sequelize.UUIDV4,
+      type: Sequelize.INTEGER,
       allowNull: false,
     },
     status: {

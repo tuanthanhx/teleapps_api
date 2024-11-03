@@ -28,6 +28,7 @@ npx sequelize-cli db:migrate --env production
 npx sequelize-cli db:migrate --to 00000000000000-sample.js --env production
 npx sequelize-cli db:migrate --to 20241025231113-add-columns-to-users.js --env production
 npx sequelize-cli db:migrate --to 20241103193100-add-columns-to-tasks.js --env production
+npx sequelize-cli db:migrate --to 20241103193110-remove-columns-from-user_games.js --env production
 
 
 TEST:

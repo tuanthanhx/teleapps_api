@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const { v4: uuidv4 } = require('uuid');
+const walletService = require('../services/wallet.service');
 const logger = require('../utils/logger');
 const db = require('../models');
 
@@ -31,20 +32,23 @@ module.exports = {
       try {
         const { id: userId } = req.user;
 
-        const object = {
-          playCount: 1000000,
-        };
-
-        const [userGame] = await db.user_game.findOrCreate({
+        const wallet = await db.wallet.findOne({
           where: {
             userId,
           },
-          defaults: object,
+          attributes: ['id', 'ticket'],
+        });
+
+        // Create User Game
+        await db.user_game.findOrCreate({
+          where: {
+            userId,
+          },
         });
 
         res.json({
           data: {
-            playCount: userGame?.playCount,
+            playCount: wallet.ticket,
           },
         });
       } catch (err) {
@@ -143,9 +147,16 @@ module.exports = {
           return;
         }
 
-        if (userGame.playCount <= 0) {
+        const wallet = await db.wallet.findOne({
+          where: {
+            userId,
+          },
+          attributes: ['id', 'ticket'],
+        });
+
+        if (wallet.ticket <= 0) {
           res.status(400).send({
-            message: 'No play counts available',
+            message: 'No tickets available',
           });
           return;
         }
@@ -155,14 +166,18 @@ module.exports = {
         const headersString = `${userId}${sessionHash}${req.headers['user-agent']}${req.headers['sec-ch-ua']}${req.headers['sec-ch-ua-mobile']}${req.headers['sec-ch-ua-platform']}${req.headers.host}${req.headers.origin}${req.headers['sec-fetch-site']}${req.headers['sec-fetch-mode']}${req.headers['sec-fetch-dest']}${req.headers['accept-encoding']}${req.headers['accept-language']}`;
         const sessionSecret = crypto.createHash('md5').update(headersString).digest('hex');
 
-        userGame.playCount -= 1;
+        // Update tickets
+        wallet.ticket -= 1;
+        await wallet.save();
+
+        // Update user game
         userGame.session = sessionHash;
         userGame.sessionSecret = sessionSecret;
         await userGame.save();
 
         res.json({
           data: {
-            remainPlayCount: userGame.playCount,
+            remainPlayCount: wallet.ticket,
             session: sessionHash,
           },
         });
@@ -177,6 +192,8 @@ module.exports = {
       try {
         const { id: userId } = req.user;
         const { score, session } = req.body;
+
+        console.log(score);
 
         const userGame = await db.user_game.findOne({
           where: {
@@ -215,6 +232,10 @@ module.exports = {
 
         userGame.totalScore += score;
         await userGame.save();
+
+        if (score && score > 0) {
+          await walletService.put(userId, score, 'coin', 'Game Reward - Played');
+        }
 
         res.json({
           data: {

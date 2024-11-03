@@ -5,9 +5,19 @@ module.exports = {
     try {
       const array = [
         {
+          name: 'Free ticket',
+          description: null,
+          taskCategoryId: 2,
+          rewards: { ticket: 1 },
+          type: 'claim_asset',
+          repeatInterval: 10,
+          repeatUnit: 'minute',
+          status: 1,
+        },
+        {
           name: 'Play 3 game today',
           description: null,
-          taskCategoryId: 1,
+          taskCategoryId: 2,
           rewards: { coin: 500 },
           type: 'play_game',
           repeatInterval: 1,
@@ -20,7 +30,7 @@ module.exports = {
         {
           name: 'Invite a friend',
           description: null,
-          taskCategoryId: 1,
+          taskCategoryId: 2,
           rewards: { coin: 500 },
           type: 'invite_friend',
           repeatInterval: 1,
@@ -33,7 +43,7 @@ module.exports = {
         {
           name: 'Check news',
           description: null,
-          taskCategoryId: 1,
+          taskCategoryId: 2,
           rewards: { coin: 100 },
           type: 'visit_link',
           repeatInterval: 1,
@@ -44,7 +54,7 @@ module.exports = {
         {
           name: 'Follow TeleApps on X',
           description: null,
-          taskCategoryId: 2,
+          taskCategoryId: 3,
           rewards: { coin: 100 },
           type: 'visit_link',
           repeatInterval: null,
@@ -55,7 +65,7 @@ module.exports = {
         {
           name: 'Join TeleApps Channel',
           description: null,
-          taskCategoryId: 2,
+          taskCategoryId: 3,
           rewards: { coin: 100 },
           type: 'visit_link',
           repeatInterval: null,
@@ -66,7 +76,7 @@ module.exports = {
         {
           name: 'Join TeleApps Community',
           description: null,
-          taskCategoryId: 2,
+          taskCategoryId: 3,
           rewards: { coin: 100 },
           type: 'visit_link',
           repeatInterval: null,

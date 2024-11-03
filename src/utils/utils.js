@@ -1,3 +1,4 @@
+const dayjs = require('dayjs');
 const path = require('path');
 const logger = require('./logger');
 
@@ -63,3 +64,5 @@ exports.insertAfterProperty = (obj, key, newKey, newValue) => {
   }
   return newObject;
 };
+
+exports.getNextRepeatTime = (startTime, interval, unit) => dayjs(startTime).add(interval, unit).toISOString();

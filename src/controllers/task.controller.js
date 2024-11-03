@@ -1,9 +1,12 @@
 // const crypto = require('crypto');
 // const { v4: uuidv4 } = require('uuid');
+const dayjs = require('dayjs');
 const walletService = require('../services/wallet.service');
-const { tryParseJSON } = require('../utils/utils');
+const { tryParseJSON, getNextRepeatTime } = require('../utils/utils');
 const logger = require('../utils/logger');
 const db = require('../models');
+
+const { Op } = db.Sequelize;
 
 module.exports = {
   user: {
@@ -64,6 +67,137 @@ module.exports = {
         });
       }
     },
+    finish: async (req, res) => {
+      try {
+        const { id } = req.params;
+        const { id: userId } = req.user;
+        const { data } = req.body;
+
+        const task = await db.task.findOne({
+          where: {
+            id,
+            status: 1,
+          },
+        });
+
+        if (!task) {
+          res.status(404).json({
+            message: 'Task not found',
+          });
+          return;
+        }
+
+        const { repeatInterval, repeatUnit } = task;
+
+        const latestUserTask = await db.user_task.findOne({
+          where: {
+            userId,
+            taskId: task.id,
+          },
+          order: [['id', 'DESC']],
+        });
+
+        if (latestUserTask) {
+          if (!repeatInterval) {
+            res.status(400).json({
+              message: 'Cannot re-do this task',
+            });
+            return;
+          }
+          if (repeatInterval && repeatUnit) {
+            const nextRepeatTime = getNextRepeatTime(latestUserTask.createdAt, repeatInterval, repeatUnit);
+            const currentTime = dayjs();
+            if (currentTime.isBefore(nextRepeatTime)) {
+              res.status(400).json({
+                message: 'Cannot re-do this task until the next repeat time',
+                currentTime,
+                nextTime: nextRepeatTime,
+              });
+              return;
+            }
+          }
+        }
+
+        if (task.type === 'play_game') {
+          const taskData = tryParseJSON(task.data);
+          const { count: requiredCount } = taskData;
+
+          const gameCount = await db.game_session.count({
+            where: {
+              userId,
+              ...(latestUserTask && {
+                createdAt: {
+                  [Op.gt]: latestUserTask.createdAt,
+                },
+              }),
+            },
+          });
+          if (gameCount < requiredCount) {
+            res.status(400).json({
+              message: 'The number of games played has not yet reached the minimum requirement',
+              gameCount,
+              requiredCount,
+            });
+            return;
+          }
+        }
+
+        if (task.type === 'invite_friend') {
+          const taskData = tryParseJSON(task.data);
+          const { count: requiredCount } = taskData;
+
+          const user = await db.user.findOne({
+            where: {
+              id: userId,
+            },
+          });
+
+          const referralCount = await db.user.count({
+            where: {
+              referrerId: user.telegramId,
+              ...(latestUserTask && {
+                createdAt: {
+                  [Op.gt]: latestUserTask.createdAt,
+                },
+              }),
+            },
+          });
+          if (referralCount < requiredCount) {
+            res.status(400).json({
+              message: 'The number of invited referrals has not yet reached the minimum requirement',
+              referralCount,
+              requiredCount,
+            });
+            return;
+          }
+        }
+
+        await db.user_task.create({
+          userId,
+          taskId: task.id,
+          status: 2,
+          data,
+          claimedAt: new Date(),
+        });
+
+        const taskRewards = tryParseJSON(task.rewards);
+        for (const [asset, amount] of Object.entries(taskRewards)) {
+          if (amount && amount > 0) {
+            await walletService.put(userId, amount, asset, `Task Reward - ${task.name}`);
+          }
+        }
+
+        res.json({
+          data: true,
+        });
+      } catch (err) {
+        logger.error(err);
+        res.status(500).json({
+          message: err.message || 'Some error occurred',
+        });
+      }
+    },
+
     start: async (req, res) => {
       try {
         const { id: userId } = req.user;

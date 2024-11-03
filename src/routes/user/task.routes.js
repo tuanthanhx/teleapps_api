@@ -8,9 +8,10 @@ module.exports = (app) => {
 
   router.get('/', rules.user.index, tasks.user.index);
   router.get('/:id', rules.user.show, tasks.user.show);
-  router.post('/:id/start', tasks.user.start); // TODO: Add Rules
-  router.post('/:id/submit', tasks.user.submit); // TODO: Add Rules
-  router.post('/:id/claim', tasks.user.claim); // TODO: Add Rules
+  router.post('/:id/finish', rules.user.finish, tasks.user.finish);
+  // router.post('/:id/start', tasks.user.start); // TODO: Add Rules
+  // router.post('/:id/submit', tasks.user.submit); // TODO: Add Rules
+  // router.post('/:id/claim', tasks.user.claim); // TODO: Add Rules
 
   app.use(`/api-user/${apiVersion}/tasks`, router);
 };

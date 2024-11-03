@@ -15,5 +15,11 @@ module.exports = {
         .withMessage('id is required'),
       validateRules,
     ],
+    finish: [
+      param('id')
+        .notEmpty()
+        .withMessage('id is required'),
+      validateRules,
+    ],
   },
 };

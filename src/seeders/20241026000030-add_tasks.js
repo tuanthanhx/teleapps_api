@@ -7,7 +7,7 @@ module.exports = {
         {
           name: 'Free ticket',
           description: null,
-          taskCategoryId: 2,
+          taskCategoryId: 1,
           rewards: { ticket: 1 },
           type: 'claim_asset',
           repeatInterval: 10,

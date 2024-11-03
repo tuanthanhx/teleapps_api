@@ -97,6 +97,7 @@ module.exports = {
         const object = {
           name: item.name,
           description: item.description,
+          image: item.image,
           taskCategoryId: item.taskCategoryId,
           rewards: JSON.stringify(item.rewards),
           type: item.type,

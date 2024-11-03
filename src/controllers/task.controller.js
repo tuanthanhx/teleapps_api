@@ -12,6 +12,7 @@ module.exports = {
   user: {
     index: async (req, res) => {
       try {
+        const { id: userId } = req.user;
         const {
           taskCategoryId,
         } = req.query;
@@ -29,8 +30,44 @@ module.exports = {
           order: [['order', 'ASC']],
         });
 
+        const formattedTasks = await Promise.all(
+          tasks.map(async (task) => {
+            const { repeatInterval, repeatUnit } = task;
+            const latestUserTask = await db.user_task.findOne({
+              where: {
+                userId,
+                taskId: task.id,
+              },
+              order: [['id', 'DESC']],
+            });
+
+            let isFinished = false;
+            let nextAvailableTime = null;
+
+            if (latestUserTask) {
+              if (!repeatInterval) {
+                isFinished = true;
+              }
+              if (repeatInterval && repeatUnit) {
+                const nextRepeatTime = getNextRepeatTime(latestUserTask.createdAt, repeatInterval, repeatUnit);
+                const currentTime = dayjs();
+                if (currentTime.isBefore(nextRepeatTime)) {
+                  isFinished = true;
+                  nextAvailableTime = nextRepeatTime;
+                }
+              }
+            }
+
+            return {
+              ...task.toJSON(),
+              isFinished,
+              nextAvailableTime,
+            };
+          }),
+        );
+
         res.json({
-          data: tasks,
+          data: formattedTasks,
         });
       } catch (err) {
         logger.error(err);
@@ -41,6 +78,7 @@ module.exports = {
     },
     show: async (req, res) => {
       try {
+        const { id: userId } = req.user;
         const { id } = req.params;
 
         const task = await db.task.findOne({
@@ -57,8 +95,40 @@ module.exports = {
           return;
         }
 
+        const { repeatInterval, repeatUnit } = task;
+        const latestUserTask = await db.user_task.findOne({
+          where: {
+            userId,
+            taskId: task.id,
+          },
+          order: [['id', 'DESC']],
+        });
+
+        let isFinished = false;
+        let nextAvailableTime = null;
+
+        if (latestUserTask) {
+          if (!repeatInterval) {
+            isFinished = true;
+          }
+          if (repeatInterval && repeatUnit) {
+            const nextRepeatTime = getNextRepeatTime(latestUserTask.createdAt, repeatInterval, repeatUnit);
+            const currentTime = dayjs();
+            if (currentTime.isBefore(nextRepeatTime)) {
+              isFinished = true;
+              nextAvailableTime = nextRepeatTime;
+            }
+          }
+        }
+
+        const formattedTask = {
+          ...task.toJSON(),
+          isFinished,
+          nextAvailableTime,
+        };
+
         res.json({
-          data: task,
+          data: formattedTask,
         });
       } catch (err) {
         logger.error(err);

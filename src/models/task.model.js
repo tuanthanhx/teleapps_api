@@ -7,6 +7,9 @@ module.exports = function (sequelize, Sequelize) {
     description: {
       type: Sequelize.STRING,
     },
+    image: {
+      type: Sequelize.STRING,
+    },
     rewards: {
       type: Sequelize.JSON, // { ticket, coin, usdt, ton, etc. }
     },

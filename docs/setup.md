@@ -27,6 +27,7 @@ NODE_ENV=production npx sequelize db:seed --seed 20241026000030-add_tasks.js
 npx sequelize-cli db:migrate --env production
 npx sequelize-cli db:migrate --to 00000000000000-sample.js --env production
 npx sequelize-cli db:migrate --to 20241025231113-add-columns-to-users.js --env production
+npx sequelize-cli db:migrate --to 20241103193100-add-columns-to-tasks.js --env production
 
 
 TEST:

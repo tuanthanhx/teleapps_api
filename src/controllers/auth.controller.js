@@ -121,8 +121,17 @@ module.exports = {
           await token.update({ token: refreshToken });
         }
 
+        // Create Wallets
+        await walletService.createWallet(user.id);
+
+        // Create User Game
+        await db.user_game.findOrCreate({
+          where: {
+            userId: user.id,
+          },
+        });
+
         if (isCreatedUser) {
-          await walletService.createWallet(user.id);
           if (referrer) {
             let inviteCount = await db.user.count({ where: { referrerId } });
             inviteCount++;

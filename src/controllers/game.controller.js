@@ -39,13 +39,6 @@ module.exports = {
           attributes: ['id', 'ticket'],
         });
 
-        // Create User Game
-        await db.user_game.findOrCreate({
-          where: {
-            userId,
-          },
-        });
-
         res.json({
           data: {
             playCount: wallet.ticket,

@@ -66,8 +66,20 @@ module.exports = {
           }),
         );
 
+        const wallet = await db.wallet.findOne({
+          where: {
+            userId,
+          },
+          attributes: ['id', 'ticket'],
+        });
+
+        // Remove tasks with type 'claim_ticket' if wallet ticket count is >= 6
+        const filteredTasks = wallet.ticket >= 6
+          ? formattedTasks.filter((task) => task.type !== 'claim_ticket')
+          : formattedTasks;
+
         res.json({
-          data: formattedTasks,
+          data: filteredTasks,
         });
       } catch (err) {
         logger.error(err);
@@ -237,6 +249,21 @@ module.exports = {
               message: 'The number of invited referrals has not yet reached the minimum requirement',
               referralCount,
               requiredCount,
+            });
+            return;
+          }
+        }
+
+        if (task.type === 'claim_ticket') {
+          const wallet = await db.wallet.findOne({
+            where: {
+              userId,
+            },
+            attributes: ['id', 'ticket'],
+          });
+          if (wallet.ticket >= 6) {
+            res.status(400).json({
+              message: 'You cannot have more than 6 tickets',
             });
             return;
           }

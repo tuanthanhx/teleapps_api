@@ -10,7 +10,7 @@ module.exports = {
           image: 'https://s3.ap-southeast-1.amazonaws.com/teleapps.store/shared/assets/images/task_images/1.png',
           taskCategoryId: 1,
           rewards: { ticket: 1 },
-          type: 'claim_asset',
+          type: 'claim_ticket',
           repeatInterval: 10,
           repeatUnit: 'minute',
           status: 1,

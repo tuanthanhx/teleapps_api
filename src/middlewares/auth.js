@@ -29,8 +29,6 @@ exports.verifyToken = (req, res, next) => {
       && req.path !== `/api-common/${apiVersion}/auth/is_login`
       && req.path !== `/api-common/${apiVersion}/auth/generate_session`
       && req.path !== `/api-common/${apiVersion}/auth/me`
-      // && req.path !== `/api-common/${apiVersion}/auth/statistics`
-      // && req.path !== `/api-common/${apiVersion}/auth/login_history`
     )
   ) {
     return next();

@@ -16,11 +16,15 @@ exports.verifyToken = (req, res, next) => {
   const adminPaths = [
     '/api-admin',
   ];
+  const developerPaths = [
+    '/api-developer',
+  ];
   const userPaths = [
     '/api-user',
   ];
   const isPublicPaths = publicPaths.some((path) => req.path.startsWith(path));
   const isAdminPaths = adminPaths.some((path) => req.path.startsWith(path));
+  const isDeveloperPaths = developerPaths.some((path) => req.path.startsWith(path));
   const isUserPaths = userPaths.some((path) => req.path.startsWith(path));
 
   if (
@@ -42,6 +46,10 @@ exports.verifyToken = (req, res, next) => {
     req.user = user;
 
     if (isAdminPaths && user.userGroupId !== 6) {
+      return res.status(403).json({ error: 'You are not authorized to access this API' });
+    }
+
+    if (isDeveloperPaths && user.userGroupId !== 2) {
       return res.status(403).json({ error: 'You are not authorized to access this API' });
     }
 

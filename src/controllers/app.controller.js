@@ -10,6 +10,8 @@ module.exports = {
   common: {
     index: async (req, res) => {
       try {
+        const userId = req.user?.id;
+
         const {
           keyword,
           categoryId,
@@ -23,6 +25,10 @@ module.exports = {
         const condition = {
           status: 1,
         };
+
+        if (req.isDeveloperPaths) {
+          condition.userId = userId;
+        }
 
         if (keyword) {
           condition[Op.or] = [
@@ -349,5 +355,8 @@ module.exports = {
   admin: {
     index: async (req, res) => module.exports.common.index(req, res),
     show: async (req, res) => module.exports.common.show(req, res),
+  },
+  developer: {
+    index: async (req, res) => module.exports.common.index(req, res),
   },
 };

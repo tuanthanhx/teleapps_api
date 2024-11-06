@@ -22,14 +22,15 @@ exports.verifyToken = (req, res, next) => {
   const userPaths = [
     '/api-user',
   ];
-  const isPublicPaths = publicPaths.some((path) => req.path.startsWith(path));
-  const isAdminPaths = adminPaths.some((path) => req.path.startsWith(path));
-  const isDeveloperPaths = developerPaths.some((path) => req.path.startsWith(path));
-  const isUserPaths = userPaths.some((path) => req.path.startsWith(path));
+
+  req.isPublicPaths = publicPaths.some((path) => req.path.startsWith(path));
+  req.isAdminPaths = adminPaths.some((path) => req.path.startsWith(path));
+  req.isDeveloperPaths = developerPaths.some((path) => req.path.startsWith(path));
+  req.isUserPaths = userPaths.some((path) => req.path.startsWith(path));
 
   if (
     req.path === '/' || (
-      isPublicPaths
+      req.isPublicPaths
       && req.path !== `/api-common/${apiVersion}/auth/is_login`
       && req.path !== `/api-common/${apiVersion}/auth/generate_session`
       && req.path !== `/api-common/${apiVersion}/auth/me`
@@ -45,15 +46,15 @@ exports.verifyToken = (req, res, next) => {
     const user = jwt.verify(token, accessTokenSecret);
     req.user = user;
 
-    if (isAdminPaths && user.userGroupId !== 6) {
+    if (req.isAdminPaths && user.userGroupId !== 6) {
       return res.status(403).json({ error: 'You are not authorized to access this API' });
     }
 
-    if (isDeveloperPaths && user.userGroupId !== 2) {
+    if (req.isDeveloperPaths && user.userGroupId !== 2) {
       return res.status(403).json({ error: 'You are not authorized to access this API' });
     }
 
-    if (isUserPaths && user.userGroupId !== 1 && user.userGroupId !== 2) {
+    if (req.isUserPaths && user.userGroupId !== 1 && user.userGroupId !== 2) {
       return res.status(403).json({ error: 'You are not authorized to access this API' });
     }
 

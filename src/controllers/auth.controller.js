@@ -32,10 +32,10 @@ module.exports = {
     },
     findMe: async (req, res) => {
       try {
-        const { id } = req.user;
+        const userId = req.user?.id;
         const user = await db.user.findOne({
           where: {
-            id,
+            id: userId,
           },
         });
 
@@ -227,7 +227,7 @@ module.exports = {
     },
     generateSession: async (req, res) => {
       try {
-        const { id: userId } = req.user;
+        const userId = req.user?.id;
 
         const sessionHash = crypto.createHash('md5').update(uuidv4()).digest('hex');
 

@@ -5,11 +5,11 @@ module.exports = {
   user: {
     getProfile: async (req, res) => {
       try {
-        const { id } = req.user;
+        const userId = req.user?.id;
 
         const user = await db.user.findOne({
           where: {
-            id,
+            id: userId,
           },
         });
 
@@ -32,7 +32,7 @@ module.exports = {
     },
     updateProfile: async (req, res) => {
       try {
-        const { id: userId } = req.user;
+        const userId = req.user?.id;
 
         const {
           username,

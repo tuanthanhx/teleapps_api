@@ -12,7 +12,7 @@ module.exports = {
   user: {
     index: async (req, res) => {
       try {
-        const { id: userId } = req.user;
+        const userId = req.user?.id;
         const {
           taskCategoryId,
         } = req.query;
@@ -90,7 +90,7 @@ module.exports = {
     },
     show: async (req, res) => {
       try {
-        const { id: userId } = req.user;
+        const userId = req.user?.id;
         const { id } = req.params;
 
         const task = await db.task.findOne({
@@ -152,7 +152,7 @@ module.exports = {
     finish: async (req, res) => {
       try {
         const { id } = req.params;
-        const { id: userId } = req.user;
+        const userId = req.user?.id;
         const { data } = req.body;
 
         const task = await db.task.findOne({
@@ -297,7 +297,7 @@ module.exports = {
 
     start: async (req, res) => {
       try {
-        const { id: userId } = req.user;
+        const userId = req.user?.id;
         const { id } = req.params;
 
         const task = await db.task.findOne({
@@ -361,7 +361,7 @@ module.exports = {
     submit: async (req, res) => {
       try {
         const { id } = req.params;
-        const { id: userId } = req.user;
+        const userId = req.user?.id;
         // const { data, session } = req.body;
         const { data } = req.body;
 
@@ -428,7 +428,7 @@ module.exports = {
     claim: async (req, res) => {
       try {
         const { id } = req.params;
-        const { id: userId } = req.user;
+        const userId = req.user?.id;
 
         const task = await db.task.findOne({
           where: {

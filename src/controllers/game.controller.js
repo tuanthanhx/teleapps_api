@@ -8,7 +8,7 @@ module.exports = {
   user: {
     getBalance: async (req, res) => {
       try {
-        const { id: userId } = req.user;
+        const userId = req.user?.id;
 
         const userGame = await db.user_game.findOne({
           where: {
@@ -30,7 +30,7 @@ module.exports = {
     },
     getPlayCount: async (req, res) => {
       try {
-        const { id: userId } = req.user;
+        const userId = req.user?.id;
 
         const wallet = await db.wallet.findOne({
           where: {
@@ -75,7 +75,7 @@ module.exports = {
     },
     getHistory: async (req, res) => {
       try {
-        const { id: userId } = req.user;
+        const userId = req.user?.id;
 
         const {
           page,
@@ -125,7 +125,7 @@ module.exports = {
     },
     startGame: async (req, res) => {
       try {
-        const { id: userId } = req.user;
+        const userId = req.user?.id;
 
         const userGame = await db.user_game.findOne({
           where: {
@@ -183,7 +183,7 @@ module.exports = {
     },
     submitScore: async (req, res) => {
       try {
-        const { id: userId } = req.user;
+        const userId = req.user?.id;
         const { score, session } = req.body;
 
         console.log(score);

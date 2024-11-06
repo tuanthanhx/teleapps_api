@@ -5,7 +5,7 @@ module.exports = {
   user: {
     getReferrals: async (req, res) => {
       try {
-        const { id: userId } = req.user;
+        const userId = req.user?.id;
 
         const {
           page,

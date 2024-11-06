@@ -5,11 +5,11 @@ module.exports = {
   user: {
     developerRequest: async (req, res) => {
       try {
-        const { id } = req.user;
+        const userId = req.user?.id;
 
         const user = await db.user.findOne({
           where: {
-            id,
+            id: userId,
           },
         });
 

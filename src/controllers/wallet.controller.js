@@ -8,7 +8,7 @@ module.exports = {
   user: {
     getWallets: async (req, res) => {
       try {
-        const { id: userId } = req.user;
+        const userId = req.user?.id;
 
         const wallet = await db.wallet.findOne({
           where: {
@@ -40,7 +40,7 @@ module.exports = {
     },
     getLogs: async (req, res) => {
       try {
-        const { id: userId } = req.user;
+        const userId = req.user?.id;
 
         const {
           keyword,

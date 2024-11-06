@@ -25,15 +25,22 @@ module.exports = {
           sortOrder = 'ASC',
         } = req.query;
 
-        const condition = {
-          status: 1,
-        };
+        const condition = {};
+
+        if (req.isPublicPaths) {
+          condition.status = 1;
+        }
+
+        if (req.isAdminPaths) {
+          condition.status = { [Op.notIn]: [5, 6] };
+        }
 
         if (req.isDeveloperPaths) {
           condition.userId = userId;
-          if (status) {
-            condition.status = status;
-          }
+        }
+
+        if (status && !req.isPublicPaths) {
+          condition.status = status;
         }
 
         if (keyword) {
@@ -190,6 +197,8 @@ module.exports = {
         } else {
           formattedApp.uiProps.snsChannels = [];
         }
+
+        formattedApp.uiProps.statusName = APP_STATUS.find((item) => item.id === formattedApp.status)?.name ?? null;
 
         const reviewStatistics = await appService.getReviewStatistics(app.id);
         if (reviewStatistics) {
@@ -360,11 +369,66 @@ module.exports = {
       }
     },
   },
+  mixing: {
+    statistics: async (req, res) => {
+      try {
+        const userId = req.user?.id;
+
+        const condition = {};
+
+        if (req.isAdminPaths) {
+          condition.status = { [Op.notIn]: [5, 6] };
+        } else if (req.isDeveloperPaths) {
+          condition.userId = userId;
+        }
+
+        const statusCounts = await db.app.findAll({
+          attributes: [
+            [db.sequelize.fn('COUNT', db.sequelize.col('id')), 'all'],
+            [db.sequelize.fn('SUM', db.sequelize.literal('CASE WHEN status = 1 THEN 1 ELSE 0 END')), 'published'],
+            [db.sequelize.fn('SUM', db.sequelize.literal('CASE WHEN status = 2 THEN 1 ELSE 0 END')), 'unpublished'],
+            [db.sequelize.fn('SUM', db.sequelize.literal('CASE WHEN status = 3 THEN 1 ELSE 0 END')), 'inReview'],
+            [db.sequelize.fn('SUM', db.sequelize.literal('CASE WHEN status = 4 THEN 1 ELSE 0 END')), 'rejected'],
+            ...(req.isDeveloperPaths && [
+              [db.sequelize.fn('SUM', db.sequelize.literal('CASE WHEN status = 5 THEN 1 ELSE 0 END')), 'draft'],
+              [db.sequelize.fn('SUM', db.sequelize.literal('CASE WHEN status = 6 THEN 1 ELSE 0 END')), 'deleted'],
+            ]),
+          ],
+          where: condition,
+          raw: true,
+        });
+
+        const response = {
+          all: statusCounts[0].all || 0,
+          published: statusCounts[0].published || 0,
+          unpublished: statusCounts[0].unpublished || 0,
+          inReview: statusCounts[0].inReview || 0,
+          rejected: statusCounts[0].rejected || 0,
+          draft: statusCounts[0].draft || 0,
+          deleted: statusCounts[0].deleted || 0,
+        };
+
+        if (req.isDeveloperPaths) {
+          response.draft = statusCounts[0].draft || 0;
+          response.deleted = statusCounts[0].deleted || 0;
+        }
+
+        res.json(response);
+      } catch (err) {
+        logger.error(err);
+        res.status(500).json({
+          message: err.message || 'Some error occurred',
+        });
+      }
+    },
+  },
   admin: {
     index: async (req, res) => module.exports.common.index(req, res),
     show: async (req, res) => module.exports.common.show(req, res),
+    statistics: async (req, res) => module.exports.mixing.statistics(req, res),
   },
   developer: {
     index: async (req, res) => module.exports.common.index(req, res),
+    statistics: async (req, res) => module.exports.mixing.statistics(req, res),
   },
 };

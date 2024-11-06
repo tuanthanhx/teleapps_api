@@ -82,9 +82,11 @@ module.exports = {
   admin: {
     index: common.index,
     show: common.show,
+    statistics: [],
   },
   developer: {
     index: common.index,
     show: common.show,
+    statistics: [],
   },
 };

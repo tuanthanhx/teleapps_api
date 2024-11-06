@@ -1,5 +1,8 @@
 const { param, query } = require('express-validator');
 const { validateRules } = require('../middlewares/validators');
+const { APP_STATUS } = require('../constants/app_status.constants');
+
+const allowedStatusIds = APP_STATUS.map((status) => status.id);
 
 const validateId = param('id')
   .notEmpty()
@@ -30,6 +33,13 @@ const common = {
       .optional()
       .trim()
       .escape(),
+    query('status')
+      .optional()
+      .isInt()
+      .withMessage('status must be integer')
+      .toInt()
+      .isIn(allowedStatusIds)
+      .withMessage(`status must be one of the following values: ${allowedStatusIds.join(', ')}`),
     query('sortField')
       .optional()
       .trim()

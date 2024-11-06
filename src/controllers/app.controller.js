@@ -1,7 +1,9 @@
 const appService = require('../services/app.service');
 const logger = require('../utils/logger');
+const { APP_STATUS } = require('../constants/app_status.constants');
 const { APP_PLATFORMS } = require('../constants/app_platform.constants');
 const { APP_SNS } = require('../constants/app_sns.constants');
+
 const db = require('../models');
 
 const { Op } = db.Sequelize;
@@ -16,6 +18,7 @@ module.exports = {
           keyword,
           categoryId,
           categorySlug,
+          status,
           page,
           limit,
           sortField,
@@ -28,6 +31,9 @@ module.exports = {
 
         if (req.isDeveloperPaths) {
           condition.userId = userId;
+          if (status) {
+            condition.status = status;
+          }
         }
 
         if (keyword) {
@@ -37,7 +43,7 @@ module.exports = {
           ];
         }
 
-        let ordering = [['createdAt', 'ASC']];
+        let ordering = req.isPublicPaths ? [['position', 'ASC']] : [['createdAt', 'DESC']];
 
         if (sortField && sortOrder) {
           const validSortFields = ['title', 'createdAt', 'updatedAt'];
@@ -54,7 +60,7 @@ module.exports = {
           where: condition,
           distinct: true,
           order: ordering,
-          attributes: ['id', 'slug', 'title', 'subTitle', 'image', 'cover', 'position', 'createdAt', 'updatedAt'],
+          attributes: ['id', 'slug', 'title', 'subTitle', 'status', 'image', 'cover', 'position', 'createdAt', 'updatedAt'],
           include: [
             {
               model: db.app_category,
@@ -83,6 +89,8 @@ module.exports = {
 
         const formattedRows = rows.map((row) => {
           const rowObj = row.toJSON();
+          rowObj.uiProps = {};
+          rowObj.uiProps.statusName = APP_STATUS.find((item) => item.id === rowObj.status)?.name ?? null;
           return rowObj;
         });
 

@@ -94,12 +94,20 @@ module.exports = {
         const { count, rows } = data;
         const totalPages = limitPerPage === -1 ? 1 : Math.ceil(count / limitPerPage);
 
-        const formattedRows = rows.map((row) => {
+        const formattedRows = await Promise.all(rows.map(async (row) => {
           const rowObj = row.toJSON();
+
+          const reviewStatistics = await appService.getReviewStatistics(row.id);
+          if (reviewStatistics) {
+            rowObj.totalReviews = reviewStatistics.totalReviews;
+            rowObj.averageRating = reviewStatistics.averageRating;
+            rowObj.reviewsCount = reviewStatistics.reviewsCount;
+          }
+
           rowObj.uiProps = {};
           rowObj.uiProps.statusName = APP_STATUS.find((item) => item.id === rowObj.status)?.name ?? null;
           return rowObj;
-        });
+        }));
 
         res.json({
           totalItems: count,

@@ -116,11 +116,19 @@ module.exports = {
     },
     show: async (req, res) => {
       try {
+        const userId = req.user?.id;
+
         const { id } = req.params;
 
-        const condition = {
-          status: 1,
-        };
+        const condition = {};
+
+        if (req.isPublicPaths) {
+          condition.status = 1;
+        }
+
+        if (req.isDeveloperPaths) {
+          condition.userId = userId;
+        }
 
         if (Number.isInteger(Number(id))) {
           condition.id = id;
@@ -429,6 +437,7 @@ module.exports = {
   },
   developer: {
     index: async (req, res) => module.exports.common.index(req, res),
+    show: async (req, res) => module.exports.common.show(req, res),
     statistics: async (req, res) => module.exports.mixing.statistics(req, res),
   },
 };

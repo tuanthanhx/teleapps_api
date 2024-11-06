@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const db = require('../models');
 
 require('dotenv').config();
 
@@ -6,7 +7,7 @@ const apiVersion = process.env.VERSION || 'v1';
 
 const accessTokenSecret = process.env.JWT_ACCESS_SECRET;
 
-exports.verifyToken = (req, res, next) => {
+exports.verifyToken = async (req, res, next) => {
   const publicPaths = [
     '/favicon.ico',
     '/public',
@@ -43,18 +44,27 @@ exports.verifyToken = (req, res, next) => {
   const token = authHeader && authHeader.split(' ')[1];
 
   try {
-    const user = jwt.verify(token, accessTokenSecret);
+    const decryptedToken = jwt.verify(token, accessTokenSecret);
+
+    const user = await db.user.findOne({
+      where: {
+        id: decryptedToken.id,
+      },
+      attributes: ['id', 'userGroupId'],
+      raw: true,
+    });
+
     req.user = user;
 
-    if (req.isAdminPaths && user.userGroupId !== 6) {
+    if (req.isAdminPaths && user?.userGroupId !== 6) {
       return res.status(403).json({ error: 'You are not authorized to access this API' });
     }
 
-    if (req.isDeveloperPaths && user.userGroupId !== 2) {
+    if (req.isDeveloperPaths && user?.userGroupId !== 2) {
       return res.status(403).json({ error: 'You are not authorized to access this API' });
     }
 
-    if (req.isUserPaths && user.userGroupId !== 1 && user.userGroupId !== 2) {
+    if (req.isUserPaths && user?.userGroupId !== 1 && user?.userGroupId !== 2) {
       return res.status(403).json({ error: 'You are not authorized to access this API' });
     }
 

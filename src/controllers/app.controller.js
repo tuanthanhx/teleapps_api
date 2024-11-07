@@ -447,5 +447,59 @@ module.exports = {
     index: async (req, res) => module.exports.common.index(req, res),
     show: async (req, res) => module.exports.common.show(req, res),
     statistics: async (req, res) => module.exports.mixing.statistics(req, res),
+    create: async (req, res) => {
+      try {
+        const userId = req.user?.id;
+
+        const {
+          slug,
+          title,
+          subTitle,
+          description,
+          appCategoryId,
+          image,
+          cover,
+          screenshots,
+          platforms,
+          languageIds,
+          telegramChannels,
+          snsChannels,
+        } = req.body;
+
+        const object = {
+          slug,
+          title,
+          subTitle,
+          description,
+          appCategoryId,
+          image,
+          cover,
+          screenshots,
+          platforms,
+          languageIds,
+          telegramChannels,
+          snsChannels,
+          userId,
+          position: null,
+          status: 5, // Draft
+        };
+
+        const createdApp = await db.app.create(object);
+
+        res.json({
+          data: true,
+          ...(process.env.NODE_ENV === 'development' && {
+            debug: {
+              createdApp,
+            },
+          }),
+        });
+      } catch (err) {
+        logger.error(err);
+        res.status(500).json({
+          message: err.message || 'Some error occurred',
+        });
+      }
+    },
   },
 };

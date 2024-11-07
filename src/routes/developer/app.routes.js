@@ -9,6 +9,7 @@ module.exports = (app) => {
   router.get('/', rules.developer.index, apps.developer.index);
   router.get('/statistics', rules.developer.statistics, apps.developer.statistics);
   router.get('/:id', rules.developer.show, apps.developer.show);
+  router.post('/', rules.developer.create, apps.developer.create);
 
   app.use(`/api-developer/${apiVersion}/apps`, router);
 };

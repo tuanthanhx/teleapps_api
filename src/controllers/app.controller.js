@@ -504,20 +504,60 @@ module.exports = {
     edit: async (req, res) => {
       try {
         const userId = req.user?.id;
+        const { id } = req.params;
 
-        console.log(userId);
+        const app = await db.app.findOne({
+          where: {
+            userId,
+            id,
+          },
+        });
+        if (!app) {
+          res.status(404).json({
+            message: 'The app either does not exist or does not belong to the current user.',
+          });
+          return;
+        }
 
-        // const {
-        //   dummy
-        // } = req.body;
+        const {
+          slug,
+          title,
+          subTitle,
+          description,
+          appCategoryId,
+          image,
+          cover,
+          screenshots,
+          platforms,
+          languageIds,
+          telegramChannels,
+          snsChannels,
+        } = req.body;
+
+        const object = {
+          slug,
+          title,
+          subTitle,
+          description,
+          appCategoryId,
+          image,
+          cover,
+          screenshots,
+          platforms,
+          languageIds,
+          telegramChannels,
+          snsChannels,
+        };
+
+        await app.update(object);
 
         res.json({
-          data: 'test ok',
-          // ...(process.env.NODE_ENV === 'development' && {
-          //   debug: {
-          //     createdApp,
-          //   },
-          // }),
+          data: true,
+          ...(process.env.NODE_ENV === 'development' && {
+            debug: {
+              app,
+            },
+          }),
         });
       } catch (err) {
         logger.error(err);

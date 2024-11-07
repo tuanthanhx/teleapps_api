@@ -203,5 +203,39 @@ module.exports = {
         .withMessage('Each snsChannel must have a valid id and url'),
       validateRules,
     ],
+    edit: [
+      param('id')
+        .notEmpty()
+        .withMessage('id is required')
+        .custom((id) => {
+          console.log(id);
+          return true;
+        }),
+      validateRules,
+    ],
+    submit: [
+      param('id')
+        .notEmpty()
+        .withMessage('id is required'),
+      validateRules,
+    ],
+    revoke: [
+      param('id')
+        .notEmpty()
+        .withMessage('id is required'),
+      validateRules,
+    ],
+    delete: [
+      param('id')
+        .notEmpty()
+        .withMessage('id is required'),
+      validateRules,
+    ],
+    restore: [
+      param('id')
+        .notEmpty()
+        .withMessage('id is required'),
+      validateRules,
+    ],
   },
 };

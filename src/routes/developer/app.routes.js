@@ -11,5 +11,12 @@ module.exports = (app) => {
   router.get('/:id', rules.developer.show, apps.developer.show);
   router.post('/', rules.developer.create, apps.developer.create);
 
+  // router.put('/:id', rules.developer.edit, apps.developer.edit); // TODO: Later
+
+  router.post('/:id/submit', rules.developer.submit, apps.developer.submit);
+  router.post('/:id/revoke', rules.developer.revoke, apps.developer.revoke);
+  router.delete('/:id/delete', rules.developer.delete, apps.developer.delete);
+  router.post('/:id/restore', rules.developer.restore, apps.developer.restore);
+
   app.use(`/api-developer/${apiVersion}/apps`, router);
 };

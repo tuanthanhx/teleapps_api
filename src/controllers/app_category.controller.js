@@ -158,4 +158,8 @@ module.exports = {
     index: async (req, res) => module.exports.common.index(req, res),
     show: async (req, res) => module.exports.common.show(req, res),
   },
+  developer: {
+    index: async (req, res) => module.exports.common.index(req, res),
+    show: async (req, res) => module.exports.common.show(req, res),
+  },
 };

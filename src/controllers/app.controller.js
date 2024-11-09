@@ -12,13 +12,14 @@ module.exports = {
   common: {
     index: async (req, res) => {
       try {
-        const userId = req.user?.id;
+        const currentUserId = req.user?.id;
 
         const {
           keyword,
           categoryId,
           categorySlug,
           status,
+          userId,
           page,
           limit,
           sortField,
@@ -33,10 +34,13 @@ module.exports = {
 
         if (req.isAdminPaths) {
           condition.status = { [Op.notIn]: [5, 6] };
+          if (userId) {
+            condition.userId = userId;
+          }
         }
 
         if (req.isDeveloperPaths) {
-          condition.userId = userId;
+          condition.userId = currentUserId;
         }
 
         if (status && !req.isPublicPaths) {
@@ -67,7 +71,7 @@ module.exports = {
           where: condition,
           distinct: true,
           order: ordering,
-          attributes: ['id', 'slug', 'title', 'subTitle', 'status', 'image', 'cover', 'position', 'createdAt', 'updatedAt'],
+          attributes: ['id', 'slug', 'title', 'subTitle', 'status', 'image', 'cover', 'position', 'createdAt', 'updatedAt', ...(req.isAdminPaths ? ['userId'] : [])],
           include: [
             {
               model: db.app_category,
@@ -79,6 +83,12 @@ module.exports = {
               },
               required: !!categoryId || !!categorySlug,
             },
+            ...(req.isAdminPaths ? [
+              {
+                model: db.user,
+                attributes: ['id', 'username', 'telegramId', 'telegramPremium', 'userGroupId', 'firstName', 'lastName', 'avatar'],
+              },
+            ] : []),
           ],
         };
 
@@ -160,6 +170,12 @@ module.exports = {
               offset: 0,
               limit: 1,
             },
+            ...(req.isAdminPaths ? [
+              {
+                model: db.user,
+                attributes: ['id', 'username', 'telegramId', 'telegramPremium', 'userGroupId', 'firstName', 'lastName', 'avatar'],
+              },
+            ] : []),
           ],
         });
 
@@ -405,7 +421,7 @@ module.exports = {
             [db.sequelize.fn('SUM', db.sequelize.literal('CASE WHEN status = 2 THEN 1 ELSE 0 END')), 'unpublished'],
             [db.sequelize.fn('SUM', db.sequelize.literal('CASE WHEN status = 3 THEN 1 ELSE 0 END')), 'inReview'],
             [db.sequelize.fn('SUM', db.sequelize.literal('CASE WHEN status = 4 THEN 1 ELSE 0 END')), 'rejected'],
-            ...(req.isDeveloperPaths && [
+            ...(req.isDeveloperPaths ? [] : [
               [db.sequelize.fn('SUM', db.sequelize.literal('CASE WHEN status = 5 THEN 1 ELSE 0 END')), 'draft'],
               [db.sequelize.fn('SUM', db.sequelize.literal('CASE WHEN status = 6 THEN 1 ELSE 0 END')), 'deleted'],
             ]),
@@ -420,14 +436,11 @@ module.exports = {
           unpublished: statusCounts[0].unpublished || 0,
           inReview: statusCounts[0].inReview || 0,
           rejected: statusCounts[0].rejected || 0,
-          draft: statusCounts[0].draft || 0,
-          deleted: statusCounts[0].deleted || 0,
+          ...(req.isDeveloperPaths && {
+            draft: statusCounts[0].draft || 0,
+            deleted: statusCounts[0].deleted || 0,
+          }),
         };
-
-        if (req.isDeveloperPaths) {
-          response.draft = statusCounts[0].draft || 0;
-          response.deleted = statusCounts[0].deleted || 0;
-        }
 
         res.json(response);
       } catch (err) {

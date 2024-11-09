@@ -1,3 +1,4 @@
+const { APP_CATEGORY_STATUS } = require('../constants/app_category_status.constants');
 const logger = require('../utils/logger');
 const db = require('../models');
 
@@ -15,9 +16,12 @@ module.exports = {
           sortOrder = 'ASC',
         } = req.query;
 
-        const condition = {
-          status: 1,
-        };
+        const condition = {};
+
+        if (!req.isAdminPaths) {
+          condition.status = 1;
+        }
+
         if (keyword) {
           condition[Op.or] = [
             { name: { [Op.like]: `%${keyword}%` } },
@@ -55,11 +59,18 @@ module.exports = {
         const { count, rows } = data;
         const totalPages = limitPerPage === -1 ? 1 : Math.ceil(count / limitPerPage);
 
+        const formattedRows = rows.map((row) => {
+          const rowObj = row.toJSON();
+          rowObj.uiProps = {};
+          rowObj.uiProps.statusName = APP_CATEGORY_STATUS.find((item) => item.id === rowObj.status)?.name ?? null;
+          return rowObj;
+        });
+
         res.json({
           totalItems: count,
           totalPages,
           currentPage: pageNo,
-          data: rows,
+          data: formattedRows,
         });
       } catch (err) {
         logger.error(err);
@@ -72,9 +83,11 @@ module.exports = {
       try {
         const { id } = req.params;
 
-        const condition = {
-          status: 1,
-        };
+        const condition = {};
+
+        if (!req.isAdminPaths) {
+          condition.status = 1;
+        }
 
         if (Number.isInteger(Number(id))) {
           condition.id = id;
@@ -93,8 +106,12 @@ module.exports = {
           return;
         }
 
+        const formattedAppCategory = appCategory.toJSON();
+        formattedAppCategory.uiProps = {};
+        formattedAppCategory.uiProps.statusName = APP_CATEGORY_STATUS.find((item) => item.id === formattedAppCategory.status)?.name ?? null;
+
         res.json({
-          data: appCategory,
+          data: formattedAppCategory,
         });
       } catch (err) {
         logger.error(err);
@@ -107,9 +124,11 @@ module.exports = {
       try {
         const { id } = req.params;
 
-        const condition = {
-          status: 1,
-        };
+        const condition = {};
+
+        if (!req.isAdminPaths) {
+          condition.status = 1;
+        }
 
         if (Number.isInteger(Number(id))) {
           condition.id = id;

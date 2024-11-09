@@ -58,6 +58,10 @@ const common = {
       .toInt()
       .isIn(allowedStatusIds)
       .withMessage(`status must be one of the following values: ${allowedStatusIds.join(', ')}`),
+    query('userId')
+      .optional()
+      .trim()
+      .escape(),
     query('sortField')
       .optional()
       .trim()

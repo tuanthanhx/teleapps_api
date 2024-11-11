@@ -57,7 +57,7 @@ module.exports = {
         let ordering = req.isPublicPaths ? [['position', 'ASC']] : [['createdAt', 'DESC']];
 
         if (sortField && sortOrder) {
-          const validSortFields = ['title', 'createdAt', 'updatedAt'];
+          const validSortFields = ['title', 'status', 'position', 'createdAt', 'updatedAt'];
           const validSortOrder = ['asc', 'desc'];
           if (validSortFields.includes(sortField) && validSortOrder.includes(sortOrder.toLowerCase())) {
             ordering = [[sortField, sortOrder.toUpperCase()]];

@@ -124,7 +124,7 @@ module.exports = {
         }),
       body('title')
         .notEmpty()
-        .withMessage('slug is required')
+        .withMessage('title is required')
         .trim()
         .escape()
         .custom(async (title) => {
@@ -135,14 +135,10 @@ module.exports = {
         }),
       body('subTitle')
         .optional()
-        .isString()
-        .withMessage('subTitle must be a string')
         .trim()
         .escape(),
       body('description')
         .optional()
-        .isString()
-        .withMessage('description must be a string')
         .trim()
         .escape(),
       body('appCategoryId')
@@ -242,14 +238,10 @@ module.exports = {
         }),
       body('subTitle')
         .optional()
-        .isString()
-        .withMessage('subTitle must be a string')
         .trim()
         .escape(),
       body('description')
         .optional()
-        .isString()
-        .withMessage('description must be a string')
         .trim()
         .escape(),
       body('appCategoryId')

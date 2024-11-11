@@ -111,17 +111,6 @@ module.exports = {
     show: common.show,
     statistics: [],
     create: [
-      body('slug')
-        .notEmpty()
-        .withMessage('slug is required')
-        .trim()
-        .escape()
-        .custom(async (slug) => {
-          const app = await db.app.findOne({ where: { slug } });
-          if (app) {
-            throw new Error('slug already in use');
-          }
-        }),
       body('title')
         .notEmpty()
         .withMessage('title is required')
@@ -215,16 +204,6 @@ module.exports = {
         .custom((id) => {
           console.log(id);
           return true;
-        }),
-      body('slug')
-        .optional()
-        .trim()
-        .escape()
-        .custom(async (slug, { req }) => {
-          const app = await db.app.findOne({ where: { slug, id: { [db.Sequelize.Op.ne]: req.params.id } } });
-          if (app) {
-            throw new Error('slug already in use by another app');
-          }
         }),
       body('title')
         .optional()

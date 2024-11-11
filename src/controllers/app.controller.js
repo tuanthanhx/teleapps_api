@@ -1,3 +1,4 @@
+const slugify = require('slugify');
 const appService = require('../services/app.service');
 const logger = require('../utils/logger');
 const { APP_STATUS } = require('../constants/app_status.constants');
@@ -465,7 +466,6 @@ module.exports = {
         const userId = req.user?.id;
 
         const {
-          slug,
           title,
           subTitle,
           description,
@@ -480,7 +480,6 @@ module.exports = {
         } = req.body;
 
         const object = {
-          slug,
           title,
           subTitle,
           description,
@@ -496,6 +495,21 @@ module.exports = {
           position: null,
           status: 5, // Draft
         };
+
+        const slug = slugify(title, {
+          lower: true,
+          strict: true,
+        });
+
+        let uniqueSlug = slug;
+        let suffix = 1;
+
+        while (await db.app.findOne({ where: { slug: uniqueSlug } })) {
+          suffix += 1;
+          uniqueSlug = `${slug}-${suffix}`;
+        }
+
+        object.slug = uniqueSlug;
 
         const createdApp = await db.app.create(object);
 
@@ -533,7 +547,6 @@ module.exports = {
         }
 
         const {
-          slug,
           title,
           subTitle,
           description,
@@ -548,7 +561,6 @@ module.exports = {
         } = req.body;
 
         const object = {
-          slug,
           title,
           subTitle,
           description,
@@ -561,6 +573,23 @@ module.exports = {
           telegramChannels,
           snsChannels,
         };
+
+        if (title && title !== app.title) {
+          const slug = slugify(title, {
+            lower: true,
+            strict: true,
+          });
+
+          let uniqueSlug = slug;
+          let suffix = 1;
+
+          while (await db.app.findOne({ where: { slug: uniqueSlug, id: { [db.Sequelize.Op.ne]: id } } })) {
+            suffix += 1;
+            uniqueSlug = `${slug}-${suffix}`;
+          }
+
+          object.slug = uniqueSlug;
+        }
 
         await app.update(object);
 

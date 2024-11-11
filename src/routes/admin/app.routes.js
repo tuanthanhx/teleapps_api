@@ -9,12 +9,8 @@ module.exports = (app) => {
   router.get('/', rules.admin.index, apps.admin.index);
   router.get('/statistics', rules.admin.statistics, apps.admin.statistics);
   router.get('/:id', rules.admin.show, apps.admin.show);
-  // router.post('/', rules.admin.create, apps.admin.create);
-  // router.put('/:id', rules.admin.edit, apps.admin.edit);
-  // router.post('/:id/submit', rules.admin.submit, apps.admin.submit);
-  // router.post('/:id/revoke', rules.admin.revoke, apps.admin.revoke);
-  // router.delete('/:id/delete', rules.admin.delete, apps.admin.delete);
-  // router.post('/:id/restore', rules.admin.restore, apps.admin.restore);
+  router.post('/:id/approve', rules.admin.approve, apps.admin.approve);
+  router.post('/:id/reject', rules.admin.reject, apps.admin.reject);
 
   app.use(`/api-admin/${apiVersion}/apps`, router);
 };

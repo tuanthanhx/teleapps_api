@@ -105,6 +105,8 @@ module.exports = {
     index: common.index,
     show: common.show,
     statistics: [],
+    approve: [],
+    reject: [],
   },
   developer: {
     index: common.index,

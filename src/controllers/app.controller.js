@@ -456,6 +456,90 @@ module.exports = {
     index: async (req, res) => module.exports.common.index(req, res),
     show: async (req, res) => module.exports.common.show(req, res),
     statistics: async (req, res) => module.exports.mixing.statistics(req, res),
+    approve: async (req, res) => {
+      try {
+        const { id } = req.params;
+
+        const app = await db.app.findOne({
+          where: {
+            id,
+          },
+          attributes: ['id', 'status'],
+        });
+        if (!app) {
+          res.status(404).json({
+            message: 'The app does not exist',
+          });
+          return;
+        }
+        if (app.status !== 3) {
+          res.status(400).json({
+            message: 'The app cannot be approved because its status is not \'In-Review\'.',
+          });
+          return;
+        }
+
+        await app.update({
+          status: 1,
+        });
+
+        res.json({
+          data: true,
+          ...(process.env.NODE_ENV === 'development' && {
+            debug: {
+              app,
+            },
+          }),
+        });
+      } catch (err) {
+        logger.error(err);
+        res.status(500).json({
+          message: err.message || 'Some error occurred',
+        });
+      }
+    },
+    reject: async (req, res) => {
+      try {
+        const { id } = req.params;
+
+        const app = await db.app.findOne({
+          where: {
+            id,
+          },
+          attributes: ['id', 'status'],
+        });
+        if (!app) {
+          res.status(404).json({
+            message: 'The app does not exist',
+          });
+          return;
+        }
+        if (app.status !== 3) {
+          res.status(400).json({
+            message: 'The app cannot be rejected because its status is not \'In-Review\'.',
+          });
+          return;
+        }
+
+        await app.update({
+          status: 4,
+        });
+
+        res.json({
+          data: true,
+          ...(process.env.NODE_ENV === 'development' && {
+            debug: {
+              app,
+            },
+          }),
+        });
+      } catch (err) {
+        logger.error(err);
+        res.status(500).json({
+          message: err.message || 'Some error occurred',
+        });
+      }
+    },
   },
   developer: {
     index: async (req, res) => module.exports.common.index(req, res),

@@ -199,7 +199,7 @@ module.exports = {
         .withMessage('Each snsChannel must have a valid id and url'),
       validateRules,
     ],
-    edit: [
+    update: [
       param('id')
         .notEmpty()
         .withMessage('id is required')
@@ -307,6 +307,24 @@ module.exports = {
       validateRules,
     ],
     restore: [
+      param('id')
+        .notEmpty()
+        .withMessage('id is required'),
+      validateRules,
+    ],
+    publish: [
+      param('id')
+        .notEmpty()
+        .withMessage('id is required'),
+      validateRules,
+    ],
+    unpublish: [
+      param('id')
+        .notEmpty()
+        .withMessage('id is required'),
+      validateRules,
+    ],
+    draft: [
       param('id')
         .notEmpty()
         .withMessage('id is required'),

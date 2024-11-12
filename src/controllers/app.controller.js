@@ -612,7 +612,7 @@ module.exports = {
         });
       }
     },
-    edit: async (req, res) => {
+    update: async (req, res) => {
       try {
         const userId = req.user?.id;
         const { id } = req.params;
@@ -626,6 +626,13 @@ module.exports = {
         if (!app) {
           res.status(404).json({
             message: 'The app either does not exist or does not belong to the current user.',
+          });
+          return;
+        }
+
+        if (app.status !== 5) {
+          res.status(400).json({
+            message: 'Updating is not allowed for the current status',
           });
           return;
         }
@@ -712,7 +719,7 @@ module.exports = {
         }
         if (app.status !== 5) {
           res.status(400).json({
-            message: 'The app cannot be submitted because its status is not \'Draft\'.',
+            message: 'Submission is not allowed for the current status',
           });
           return;
         }
@@ -756,13 +763,101 @@ module.exports = {
         }
         if (app.status !== 3) {
           res.status(400).json({
-            message: 'The app cannot be revoked because its status is not \'In Review\'.',
+            message: 'Revocation is not allowed for the current status',
           });
           return;
         }
 
         await app.update({
           status: 5, // Draft
+        });
+
+        res.json({
+          data: true,
+          ...(process.env.NODE_ENV === 'development' && {
+            debug: {
+              app,
+            },
+          }),
+        });
+      } catch (err) {
+        logger.error(err);
+        res.status(500).json({
+          message: err.message || 'Some error occurred',
+        });
+      }
+    },
+    publish: async (req, res) => {
+      try {
+        const userId = req.user?.id;
+        const { id } = req.params;
+
+        const app = await db.app.findOne({
+          where: {
+            userId,
+            id,
+          },
+          attributes: ['id', 'status'],
+        });
+        if (!app) {
+          res.status(404).json({
+            message: 'The app either does not exist or does not belong to the current user.',
+          });
+          return;
+        }
+        if (app.status !== 2) {
+          res.status(400).json({
+            message: 'Publishing is not allowed for the current status',
+          });
+          return;
+        }
+
+        await app.update({
+          status: 1, // Published
+        });
+
+        res.json({
+          data: true,
+          ...(process.env.NODE_ENV === 'development' && {
+            debug: {
+              app,
+            },
+          }),
+        });
+      } catch (err) {
+        logger.error(err);
+        res.status(500).json({
+          message: err.message || 'Some error occurred',
+        });
+      }
+    },
+    unpublish: async (req, res) => {
+      try {
+        const userId = req.user?.id;
+        const { id } = req.params;
+
+        const app = await db.app.findOne({
+          where: {
+            userId,
+            id,
+          },
+          attributes: ['id', 'status'],
+        });
+        if (!app) {
+          res.status(404).json({
+            message: 'The app either does not exist or does not belong to the current user.',
+          });
+          return;
+        }
+        if (app.status !== 1) {
+          res.status(400).json({
+            message: 'Unpublishing is not allowed for the current status',
+          });
+          return;
+        }
+
+        await app.update({
+          status: 2, // Unpublished
         });
 
         res.json({
@@ -798,9 +893,9 @@ module.exports = {
           });
           return;
         }
-        if (app.status !== 5) {
+        if (app.status !== 5 && app.status !== 1 && app.status !== 2) {
           res.status(400).json({
-            message: 'The app cannot be deleted because its status is not \'Draft\'.',
+            message: 'Deletion is not allowed for the current status',
           });
           return;
         }
@@ -844,7 +939,51 @@ module.exports = {
         }
         if (app.status !== 6) {
           res.status(400).json({
-            message: 'The app cannot be restored because its status is not \'Deleted\'.',
+            message: 'Restoration is not allowed for the current status',
+          });
+          return;
+        }
+
+        await app.update({
+          status: 5, // Draft
+        });
+
+        res.json({
+          data: true,
+          ...(process.env.NODE_ENV === 'development' && {
+            debug: {
+              app,
+            },
+          }),
+        });
+      } catch (err) {
+        logger.error(err);
+        res.status(500).json({
+          message: err.message || 'Some error occurred',
+        });
+      }
+    },
+    draft: async (req, res) => {
+      try {
+        const userId = req.user?.id;
+        const { id } = req.params;
+
+        const app = await db.app.findOne({
+          where: {
+            userId,
+            id,
+          },
+          attributes: ['id', 'status'],
+        });
+        if (!app) {
+          res.status(404).json({
+            message: 'The app either does not exist or does not belong to the current user.',
+          });
+          return;
+        }
+        if (app.status !== 5 && app.status !== 1 && app.status !== 2) {
+          res.status(400).json({
+            message: 'Changing to draft is not allowed for the current status',
           });
           return;
         }

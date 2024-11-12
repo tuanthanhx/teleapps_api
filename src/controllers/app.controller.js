@@ -422,10 +422,10 @@ module.exports = {
             [db.sequelize.fn('SUM', db.sequelize.literal('CASE WHEN status = 2 THEN 1 ELSE 0 END')), 'unpublished'],
             [db.sequelize.fn('SUM', db.sequelize.literal('CASE WHEN status = 3 THEN 1 ELSE 0 END')), 'inReview'],
             [db.sequelize.fn('SUM', db.sequelize.literal('CASE WHEN status = 4 THEN 1 ELSE 0 END')), 'rejected'],
-            ...(req.isDeveloperPaths ? [] : [
+            ...(req.isDeveloperPaths ? [
               [db.sequelize.fn('SUM', db.sequelize.literal('CASE WHEN status = 5 THEN 1 ELSE 0 END')), 'draft'],
               [db.sequelize.fn('SUM', db.sequelize.literal('CASE WHEN status = 6 THEN 1 ELSE 0 END')), 'deleted'],
-            ]),
+            ] : []),
           ],
           where: condition,
           raw: true,

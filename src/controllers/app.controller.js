@@ -149,11 +149,7 @@ module.exports = {
           condition.userId = userId;
         }
 
-        if (Number.isInteger(Number(id))) {
-          condition.id = id;
-        } else {
-          condition.slug = id;
-        }
+        condition[Op.or] = [{ id }, { slug: id }];
 
         const app = await db.app.findOne({
           where: condition,

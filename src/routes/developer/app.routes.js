@@ -15,9 +15,9 @@ module.exports = (app) => {
   router.post('/:id/revoke', rules.developer.revoke, apps.developer.revoke);
   router.delete('/:id', rules.developer.delete, apps.developer.delete);
   router.post('/:id/restore', rules.developer.restore, apps.developer.restore);
-  // router.post('/:id/publish', rules.developer.publish, apps.developer.publish);
-  // router.post('/:id/unpublish', rules.developer.unpublish, apps.developer.unpublish);
-  // router.post('/:id/draft', rules.developer.draft, apps.developer.draft);
+  router.post('/:id/publish', rules.developer.publish, apps.developer.publish);
+  router.post('/:id/unpublish', rules.developer.unpublish, apps.developer.unpublish);
+  router.post('/:id/draft', rules.developer.draft, apps.developer.draft);
 
   app.use(`/api-developer/${apiVersion}/apps`, router);
 };

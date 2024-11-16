@@ -47,7 +47,11 @@ NODE_ENV=production npx sequelize db:seed --seed 20241114000010-add_apps_118_cha
 NODE_ENV=production npx sequelize db:seed --seed 20241114000010-add_apps_119_dex.js
 
 NODE_ENV=production npx sequelize db:seed --seed 20240901000005-add_app_covers.js
+NODE_ENV=production npx sequelize db:seed --seed 20240901000010-add_slider_items.js
+NODE_ENV=production npx sequelize db:seed --seed 20240901000011-add_app_category_slider_items.js
 
+NODE_ENV=production npx sequelize db:seed --seed 20240901000006-add_app_histories.js
+NODE_ENV=production npx sequelize db:seed --seed 20240901000008-add_app_reviews.js
 
 # MIGRATION
 

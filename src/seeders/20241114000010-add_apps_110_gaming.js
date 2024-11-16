@@ -18293,12 +18293,24 @@ module.exports = {
           description: item.description,
           cover: null,
           screenshots: item.screenshotPaths ? JSON.stringify(item.screenshotPaths) : null,
-          platforms: JSON.stringify({
-            web: item.links?.webSite || null,
-            ios: item.links?.appStore || null,
-            android: item.links?.googlePlay || null,
-            telegram: item.links?.tgChannel || null,
-          }),
+          platforms: JSON.stringify([
+            {
+              id: 'ios',
+              url: item.links?.ios || null,
+            },
+            {
+              id: 'android',
+              url: item.links?.android || null,
+            },
+            {
+              id: 'telegram',
+              url: item.links?.telegram || null,
+            },
+            {
+              id: 'web',
+              url: item.links?.web || null,
+            },
+          ]),
           languageIds: item.languageCodes?.length ? JSON.stringify(normalizeLanguageCodes(item.languageCodes)) : null,
           telegramChannels: JSON.stringify(
             [item.links?.tgBot, item.links?.tgChat].filter((link) => link !== null && link !== undefined),

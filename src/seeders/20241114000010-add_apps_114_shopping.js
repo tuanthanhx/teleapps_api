@@ -799,6 +799,7 @@ module.exports = {
             },
           ]),
           status: 1,
+          position: array.indexOf(item) + 1,
           appCategoryId: 114,
           createdAt: new Date(baseTime),
           updatedAt: new Date(baseTime),

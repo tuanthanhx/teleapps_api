@@ -23,6 +23,8 @@ NODE_ENV=production npx sequelize db:seed --seed 20241026000030-add_tasks.js
 
 NODE_ENV=production npx sequelize db:seed --seed 20240901000003-add_app_categories_02.js
 
+# ===
+
 NODE_ENV=production npx sequelize db:seed --seed 20241114000010-add_apps_100_exchange_cex.js
 NODE_ENV=production npx sequelize db:seed --seed 20241114000010-add_apps_101_staking.js
 NODE_ENV=production npx sequelize db:seed --seed 20241114000010-add_apps_102_wallets.js
@@ -43,6 +45,8 @@ NODE_ENV=production npx sequelize db:seed --seed 20241114000010-add_apps_116_rwa
 NODE_ENV=production npx sequelize db:seed --seed 20241114000010-add_apps_117_audit.js
 NODE_ENV=production npx sequelize db:seed --seed 20241114000010-add_apps_118_channels.js
 NODE_ENV=production npx sequelize db:seed --seed 20241114000010-add_apps_119_dex.js
+
+NODE_ENV=production npx sequelize db:seed --seed 20240901000005-add_app_covers.js
 
 
 # MIGRATION

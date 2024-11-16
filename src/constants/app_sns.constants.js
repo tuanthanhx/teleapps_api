@@ -1,5 +1,9 @@
 exports.APP_SNS = [
   {
+    id: 'github',
+    name: 'Github',
+  },
+  {
     id: 'instagram',
     name: 'Instagram',
   },

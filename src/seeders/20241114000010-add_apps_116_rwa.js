@@ -32,17 +32,39 @@ module.exports = {
             telegram: item.links?.tgChannel || null,
           }),
           languageIds: item.languageCodes?.length ? JSON.stringify(normalizeLanguageCodes(item.languageCodes)) : null,
-          links: JSON.stringify({
-            telegramBot: item.links?.tgBot || null,
-            telegramChat: item.links?.tgChat || null,
-            github: item.links?.github || null,
-            instagram: item.links?.instagram || null,
-            x: item.links?.twitter || null,
-            youtube: item.links?.youtube || null,
-            medium: item.links?.medium || null,
-            reddit: item.links?.reddit || null,
-            discord: item.links?.discord || null,
-          }),
+          telegramChannels: JSON.stringify(
+            [item.links?.tgBot, item.links?.tgChat].filter((link) => link !== null && link !== undefined),
+          ),
+          snsChannels: JSON.stringify([
+            {
+              id: 'github',
+              url: item.links?.github || null,
+            },
+            {
+              id: 'instagram',
+              url: item.links?.instagram || null,
+            },
+            {
+              id: 'x',
+              url: item.links?.twitter || null,
+            },
+            {
+              id: 'youtube',
+              url: item.links?.youtube || null,
+            },
+            {
+              id: 'medium',
+              url: item.links?.instagram || null,
+            },
+            {
+              id: 'reddit',
+              url: item.links?.instagram || null,
+            },
+            {
+              id: 'discord',
+              url: item.links?.instagram || null,
+            },
+          ]),
           status: 1,
           appCategoryId: 116,
           createdAt: new Date(baseTime),

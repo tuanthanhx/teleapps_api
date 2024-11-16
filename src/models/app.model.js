@@ -35,10 +35,13 @@ module.exports = function (sequelize, Sequelize) {
     platforms: {
       type: Sequelize.JSON,
     },
-    links: {
+    languageIds: {
       type: Sequelize.JSON,
     },
-    languageIds: {
+    telegramChannels: {
+      type: Sequelize.JSON,
+    },
+    snsChannels: {
       type: Sequelize.JSON,
     },
     status: {

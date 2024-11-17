@@ -618,19 +618,19 @@ module.exports = {
           platforms: JSON.stringify([
             {
               id: 'ios',
-              url: item.links?.ios || null,
+              url: item.links?.appStore || null,
             },
             {
               id: 'android',
-              url: item.links?.android || null,
+              url: item.links?.googlePlay || null,
             },
             {
               id: 'telegram',
-              url: item.links?.telegram || null,
+              url: item.links?.tgChannel || item.appPlatforms?.tg_channel || null,
             },
             {
               id: 'web',
-              url: item.links?.web || null,
+              url: item.links?.webSite || item.appPlatforms?.web || null,
             },
           ]),
           languageIds: item.languageCodes?.length ? JSON.stringify(normalizeLanguageCodes(item.languageCodes)) : null,
@@ -656,15 +656,15 @@ module.exports = {
             },
             {
               id: 'medium',
-              url: item.links?.instagram || null,
+              url: item.links?.medium || null,
             },
             {
               id: 'reddit',
-              url: item.links?.instagram || null,
+              url: item.links?.reddit || null,
             },
             {
               id: 'discord',
-              url: item.links?.instagram || null,
+              url: item.links?.discord || null,
             },
           ]),
           status: 1,

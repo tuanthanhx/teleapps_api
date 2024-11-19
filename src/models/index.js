@@ -38,6 +38,9 @@ Object.keys(db).forEach((modelName) => {
 db.user.hasMany(db.app);
 db.app.belongsTo(db.user);
 
+db.saved_app.belongsTo(db.user);
+db.saved_app.belongsTo(db.app);
+
 db.user.hasMany(db.user_refresh_token, { onDelete: 'CASCADE' });
 db.user_refresh_token.belongsTo(db.user);
 

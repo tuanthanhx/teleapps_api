@@ -23,9 +23,10 @@ module.exports = {
         });
 
         if (exists) {
-          return res.status(400).json({
+          res.status(400).json({
             message: 'This title or a similar one is already in use.',
           });
+          return;
         }
 
         res.json({

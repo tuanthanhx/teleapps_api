@@ -6,7 +6,7 @@ module.exports = (app) => {
   require('dotenv').config();
   const apiVersion = process.env.VERSION || 'v1';
 
-  router.post('/validate_new_app_name', rules.common.validateNewAppTitle, utils.common.validateNewAppTitle);
+  router.post('/validate_new_app_title', rules.common.validateNewAppTitle, utils.common.validateNewAppTitle);
 
   app.use(`/api-common/${apiVersion}/utils`, router);
 };

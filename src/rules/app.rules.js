@@ -72,6 +72,8 @@ const common = {
       .escape(),
     validateRules,
   ],
+  new: [],
+  trending: [],
   show: [
     validateId,
     validateRules,
@@ -97,6 +99,8 @@ const common = {
 module.exports = {
   common: {
     index: common.index,
+    new: common.new,
+    trending: common.trending,
     show: common.show,
     getHistories: common.getHistories,
     getReviews: common.getReviews,

@@ -65,8 +65,27 @@ module.exports = {
           }
         }
 
-        const pageNo = parseInt(page, 10) || 1;
-        const limitPerPage = parseInt(limit, 10) || 10;
+        let pageNo = parseInt(page, 10) || 1;
+        let limitPerPage = parseInt(limit, 10) || 10;
+
+        const apiVersion = process.env.VERSION || 'v1';
+
+        if (
+          req.originalUrl === `/api-common/${apiVersion}/apps/new`
+          || req.originalUrl === `/api-common/${apiVersion}/apps/trending`
+        ) {
+          pageNo = 1;
+          limitPerPage = 10;
+        }
+
+        if (req.originalUrl === `/api-common/${apiVersion}/apps/new`) {
+          ordering = [['createdAt', 'DESC']];
+        }
+
+        if (req.originalUrl === `/api-common/${apiVersion}/apps/trending`) {
+          ordering = [['position', 'ASC'], ['createdAt', 'ASC']];
+          // TODO: Make more condition for trending, like: số lượng đánh giá và phản hồi tích cực, lượng truy cập app, lượng ref nếu có, lượng saved app, lượng vote giống
+        }
 
         const queryOptions = {
           where: condition,
@@ -120,12 +139,21 @@ module.exports = {
           return rowObj;
         }));
 
-        res.json({
-          totalItems: count,
-          totalPages,
-          currentPage: pageNo,
-          data: formattedRows,
-        });
+        if (
+          req.originalUrl === `/api-common/${apiVersion}/apps/new`
+          || req.originalUrl === `/api-common/${apiVersion}/apps/trending`
+        ) {
+          res.json({
+            data: formattedRows,
+          });
+        } else {
+          res.json({
+            totalItems: count,
+            totalPages,
+            currentPage: pageNo,
+            data: formattedRows,
+          });
+        }
       } catch (err) {
         logger.error(err);
         res.status(500).json({
@@ -133,6 +161,8 @@ module.exports = {
         });
       }
     },
+    new: async (req, res) => module.exports.common.index(req, res),
+    trending: async (req, res) => module.exports.common.index(req, res),
     show: async (req, res) => {
       try {
         const userId = req.user?.id;

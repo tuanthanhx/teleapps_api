@@ -7,6 +7,8 @@ module.exports = (app) => {
   const apiVersion = process.env.VERSION || 'v1';
 
   router.get('/', rules.common.index, apps.common.index);
+  router.get('/new', rules.common.new, apps.common.new);
+  router.get('/trending', rules.common.trending, apps.common.trending);
   router.get('/:id', rules.common.show, apps.common.show);
   router.get('/:id/histories', rules.common.getHistories, apps.common.getHistories);
   router.get('/:id/reviews', rules.common.getReviews, apps.common.getReviews);

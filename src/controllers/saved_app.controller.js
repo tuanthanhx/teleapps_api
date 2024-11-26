@@ -1,6 +1,4 @@
-// const crypto = require('crypto');
-// const { v4: uuidv4 } = require('uuid');
-// const walletService = require('../services/wallet.service');
+const appService = require('../services/app.service');
 const logger = require('../utils/logger');
 const db = require('../models');
 
@@ -87,16 +85,13 @@ module.exports = {
 
         const formattedRows = await Promise.all(rows.map(async (row) => {
           const rowObj = row.toJSON();
-
-          // const reviewStatistics = await appService.getReviewStatistics(row.id);
-          // if (reviewStatistics) {
-          //   rowObj.totalReviews = reviewStatistics.totalReviews;
-          //   rowObj.averageRating = reviewStatistics.averageRating;
-          //   rowObj.reviewsCount = reviewStatistics.reviewsCount;
-          // }
-
-          // rowObj.uiProps = {};
-          // rowObj.uiProps.statusName = APP_STATUS.find((item) => item.id === rowObj.status)?.name ?? null;
+          if (rowObj.app) {
+            const reviewStatistics = await appService.getReviewStatistics(rowObj.app.id, false);
+            if (reviewStatistics) {
+              rowObj.app.totalReviews = reviewStatistics.totalReviews;
+              rowObj.app.averageRating = reviewStatistics.averageRating;
+            }
+          }
           return rowObj;
         }));
 

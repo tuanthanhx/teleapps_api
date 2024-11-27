@@ -50,6 +50,9 @@ db.user_session.belongsTo(db.user);
 db.user.hasOne(db.wallet, { onDelete: 'CASCADE' });
 db.wallet.belongsTo(db.user);
 
+db.user.hasOne(db.connected_wallet, { onDelete: 'CASCADE' });
+db.connected_wallet.belongsTo(db.user);
+
 db.wallet.hasMany(db.wallet_log, { onDelete: 'CASCADE' });
 db.wallet_log.belongsTo(db.wallet);
 

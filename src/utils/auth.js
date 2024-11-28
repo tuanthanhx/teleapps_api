@@ -1,4 +1,6 @@
 const crypto = require('crypto');
+const axios = require('axios');
+const s3 = require('./s3');
 // const path = require('path');
 // const logger = require('./logger');
 
@@ -67,6 +69,64 @@ exports.validateTelegramInitData = (initData) => {
 
   // Return validated data as an object
   return validatedData;
+};
+
+exports.getTelegramUserAvatar = async (telegramId) => {
+  try {
+    if (!telegramId) {
+      throw new Error('Telegram ID is required.');
+    }
+
+    // Step 1: Fetch user's profile photos
+    const profilePhotosUrl = `https://api.telegram.org/bot${process.env.BOT_TOKEN_PRIMARY}/getUserProfilePhotos?user_id=${telegramId}`;
+    const profilePhotosResponse = await axios.get(profilePhotosUrl);
+
+    if (!profilePhotosResponse.data.ok || profilePhotosResponse.data.result.total_count === 0) {
+      throw new Error('No profile pictures found for this user.');
+    }
+
+    // Extract the first photo's file ID
+    const fileId = profilePhotosResponse.data.result.photos[0][0].file_id;
+
+    // Step 2: Retrieve the file path for the photo
+    const filePathUrl = `https://api.telegram.org/bot${process.env.BOT_TOKEN_PRIMARY}/getFile?file_id=${fileId}`;
+    const filePathResponse = await axios.get(filePathUrl);
+
+    if (!filePathResponse.data.ok) {
+      throw new Error('Failed to retrieve the file path for the profile picture.');
+    }
+
+    const filePath = filePathResponse.data.result.file_path;
+
+    // Step 3: Download the profile photo
+    const downloadUrl = `https://api.telegram.org/file/bot${process.env.BOT_TOKEN_PRIMARY}/${filePath}`;
+    const imageResponse = await axios.get(downloadUrl, { responseType: 'arraybuffer' });
+
+    // Prepare the file object
+    const fileBuffer = Buffer.from(imageResponse.data);
+    const file = [{
+      fieldname: 'file',
+      originalname: `user_${telegramId}_avatar.jpg`,
+      encoding: '7bit',
+      mimetype: 'image/jpeg',
+      buffer: fileBuffer,
+      size: fileBuffer.length,
+    }];
+
+    // Step 4: Upload to S3
+    const uploadedFiles = await s3.upload(file, 'shared/user/avatars', {
+      dimensions: [160, 160],
+    });
+
+    if (uploadedFiles && uploadedFiles.length) {
+      return uploadedFiles[0];
+    }
+    return null;
+  } catch (error) {
+    // Improved error message for better debugging
+    console.error(`Error fetching Telegram user avatar (Telegram ID: ${telegramId}):`, error.message);
+    throw new Error(`Failed to fetch and upload user avatar: ${error.message}`);
+  }
 };
 
 exports.calculateInvitationReward = (count) => {

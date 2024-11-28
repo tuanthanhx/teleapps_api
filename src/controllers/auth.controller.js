@@ -3,7 +3,7 @@ const crypto = require('crypto');
 const { v4: uuidv4 } = require('uuid');
 const walletService = require('../services/wallet.service');
 const logger = require('../utils/logger');
-const { validateTelegramInitData, calculateInvitationReward } = require('../utils/auth');
+const { validateTelegramInitData, getTelegramUserAvatar, calculateInvitationReward } = require('../utils/auth');
 const { generateRandomNumber } = require('../utils/utils');
 const db = require('../models');
 
@@ -154,6 +154,13 @@ module.exports = {
           }
           user.lastLogin = new Date();
           await user.save();
+        }
+
+        if (!user.avatar) {
+          const avatarUrl = await getTelegramUserAvatar(user.telegramId);
+          await user.update({
+            avatar: avatarUrl,
+          });
         }
 
         res.json({

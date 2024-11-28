@@ -1,5 +1,6 @@
 const slugify = require('slugify');
 const appService = require('../services/app.service');
+const redis = require('../utils/redis');
 const logger = require('../utils/logger');
 const { APP_STATUS } = require('../constants/app_status.constants');
 const { APP_PLATFORMS } = require('../constants/app_platform.constants');
@@ -21,8 +22,8 @@ module.exports = {
           categorySlug,
           status,
           userId,
-          page,
-          limit,
+          page = 1,
+          limit = 10,
           sortField,
           sortOrder = 'ASC',
         } = req.query;
@@ -35,9 +36,7 @@ module.exports = {
 
         if (req.isAdminPaths) {
           condition.status = { [Op.notIn]: [5, 6] };
-          if (userId) {
-            condition.userId = userId;
-          }
+          if (userId) condition.userId = userId;
         }
 
         if (req.isDeveloperPaths) {
@@ -65,26 +64,12 @@ module.exports = {
           }
         }
 
-        let pageNo = parseInt(page, 10) || 1;
-        let limitPerPage = parseInt(limit, 10) || 10;
-
-        const apiVersion = process.env.VERSION || 'v1';
-
-        if (
-          req.originalUrl === `/api-common/${apiVersion}/apps/new`
-          || req.originalUrl === `/api-common/${apiVersion}/apps/trending`
-        ) {
-          pageNo = 1;
-          limitPerPage = 10;
-        }
-
-        if (req.originalUrl === `/api-common/${apiVersion}/apps/new`) {
+        if (req.originalUrl.includes('/apps/new')) {
           ordering = [['createdAt', 'DESC']];
         }
 
-        if (req.originalUrl === `/api-common/${apiVersion}/apps/trending`) {
+        if (req.originalUrl.includes('/apps/trending')) {
           ordering = [['position', 'ASC'], ['createdAt', 'ASC']];
-          // TODO: Make more condition for trending, like: số lượng đánh giá và phản hồi tích cực, lượng truy cập app, lượng ref nếu có, lượng saved app, lượng vote giống
         }
 
         const queryOptions = {
@@ -112,17 +97,29 @@ module.exports = {
           ],
         };
 
-        if (limitPerPage !== -1) {
-          const effectiveLimit = limitPerPage;
-          const offset = (pageNo - 1) * effectiveLimit;
+        if (limit !== -1) {
+          const effectiveLimit = parseInt(limit, 10);
+          const offset = (parseInt(page, 10) - 1) * effectiveLimit;
           queryOptions.limit = effectiveLimit;
           queryOptions.offset = offset;
         }
 
-        const data = await db.app.findAndCountAll(queryOptions);
+        // Generate a dynamic cache key
+        const cacheKey = `apps:${JSON.stringify({
+          keyword, categoryId, categorySlug, status, page, limit, sortField, sortOrder, path: req.originalUrl,
+        })}`;
 
+        const cachedApps = await redis.getCache(cacheKey);
+
+        if (cachedApps) {
+          res.json(cachedApps);
+          return;
+        }
+
+        const data = await db.app.findAndCountAll(queryOptions);
         const { count, rows } = data;
-        const totalPages = limitPerPage === -1 ? 1 : Math.ceil(count / limitPerPage);
+
+        const totalPages = limit === -1 ? 1 : Math.ceil(count / limit);
 
         const formattedRows = await Promise.all(rows.map(async (row) => {
           const rowObj = row.toJSON();
@@ -136,29 +133,26 @@ module.exports = {
 
           rowObj.uiProps = {};
           rowObj.uiProps.statusName = APP_STATUS.find((item) => item.id === rowObj.status)?.name ?? null;
+
           return rowObj;
         }));
 
-        if (
-          req.originalUrl === `/api-common/${apiVersion}/apps/new`
-          || req.originalUrl === `/api-common/${apiVersion}/apps/trending`
-        ) {
-          res.json({
-            data: formattedRows,
-          });
-        } else {
-          res.json({
+        const response = req.originalUrl.includes('/apps/new') || req.originalUrl.includes('/apps/trending')
+          ? { data: formattedRows }
+          : {
             totalItems: count,
             totalPages,
-            currentPage: pageNo,
+            currentPage: parseInt(page, 10),
             data: formattedRows,
-          });
-        }
+          };
+
+        // Cache the response
+        await redis.setCache(cacheKey, response, 3600); // Cache for 1 hour
+
+        res.json(response);
       } catch (err) {
         logger.error(err);
-        res.status(500).json({
-          message: err.message || 'Some error occurred',
-        });
+        res.status(500).json({ message: err.message || 'Some error occurred' });
       }
     },
     new: async (req, res) => module.exports.common.index(req, res),

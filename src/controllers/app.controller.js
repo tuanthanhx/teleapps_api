@@ -189,14 +189,6 @@ module.exports = {
               as: 'category',
               attributes: ['id', 'icon', 'name', 'slug'],
             },
-            {
-              model: db.app_history,
-              as: 'histories',
-              separate: true,
-              order: [['createdAt', 'DESC']],
-              offset: 0,
-              limit: 1,
-            },
             ...(req.isAdminPaths ? [
               {
                 model: db.user,
@@ -268,73 +260,6 @@ module.exports = {
 
         res.json({
           data: formattedApp,
-        });
-      } catch (err) {
-        logger.error(err);
-        res.status(500).json({
-          message: err.message || 'Some error occurred',
-        });
-      }
-    },
-    getHistories: async (req, res) => {
-      try {
-        const { id } = req.params;
-
-        const {
-          page,
-          limit,
-        } = req.query;
-
-        const condition = {
-          status: 1,
-        };
-
-        if (Number.isInteger(Number(id))) {
-          condition.id = id;
-        } else {
-          condition.slug = id;
-        }
-
-        const app = await db.app.findOne({
-          where: condition,
-          attributes: ['id'],
-        });
-
-        if (!app) {
-          res.status(404).json({
-            message: 'App not found',
-          });
-          return;
-        }
-
-        const pageNo = parseInt(page, 10) || 1;
-        const limitPerPage = parseInt(limit, 10) || 10;
-
-        const queryOptions = {
-          where: {
-            appId: app.id,
-          },
-          distinct: true,
-          order: [['createdAt', 'DESC']],
-        };
-
-        if (limitPerPage !== -1) {
-          const effectiveLimit = limitPerPage;
-          const offset = (pageNo - 1) * effectiveLimit;
-          queryOptions.limit = effectiveLimit;
-          queryOptions.offset = offset;
-        }
-
-        const data = await db.app_history.findAndCountAll(queryOptions);
-
-        const { count, rows } = data;
-        const totalPages = limitPerPage === -1 ? 1 : Math.ceil(count / limitPerPage);
-
-        res.json({
-          totalItems: count,
-          totalPages,
-          currentPage: pageNo,
-          data: rows,
         });
       } catch (err) {
         logger.error(err);

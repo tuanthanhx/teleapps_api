@@ -59,9 +59,6 @@ db.wallet_log.belongsTo(db.wallet);
 db.app.belongsTo(db.app_category, { as: 'category', foreignKey: 'appCategoryId' });
 db.app_category.hasMany(db.app);
 
-db.app.hasMany(db.app_history, { as: 'histories', onDelete: 'CASCADE' });
-db.app_history.belongsTo(db.app);
-
 db.app.hasMany(db.app_review, { onDelete: 'CASCADE' });
 db.app_review.belongsTo(db.app);
 

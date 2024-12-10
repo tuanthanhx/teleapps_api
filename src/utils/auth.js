@@ -74,7 +74,7 @@ exports.validateTelegramInitData = (initData) => {
 exports.getTelegramUserAvatar = async (telegramId) => {
   try {
     if (!telegramId) {
-      throw new Error('Telegram ID is required.');
+      return null;
     }
 
     // Step 1: Fetch user's profile photos
@@ -82,7 +82,8 @@ exports.getTelegramUserAvatar = async (telegramId) => {
     const profilePhotosResponse = await axios.get(profilePhotosUrl);
 
     if (!profilePhotosResponse.data.ok || profilePhotosResponse.data.result.total_count === 0) {
-      throw new Error('No profile pictures found for this user.');
+      console.error('No profile pictures found for this user.');
+      return null;
     }
 
     // Extract the first photo's file ID
@@ -93,7 +94,8 @@ exports.getTelegramUserAvatar = async (telegramId) => {
     const filePathResponse = await axios.get(filePathUrl);
 
     if (!filePathResponse.data.ok) {
-      throw new Error('Failed to retrieve the file path for the profile picture.');
+      console.error('Failed to retrieve the file path for the profile picture.');
+      return null;
     }
 
     const filePath = filePathResponse.data.result.file_path;
@@ -123,9 +125,7 @@ exports.getTelegramUserAvatar = async (telegramId) => {
     }
     return null;
   } catch (error) {
-    // Improved error message for better debugging
     console.error(`Error fetching Telegram user avatar (Telegram ID: ${telegramId}):`, error.message);
-    throw new Error(`Failed to fetch and upload user avatar: ${error.message}`);
   }
 };
 

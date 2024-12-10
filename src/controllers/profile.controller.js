@@ -1,3 +1,4 @@
+const { getTelegramUserAvatar } = require('../utils/auth');
 const logger = require('../utils/logger');
 const db = require('../models');
 
@@ -134,6 +135,38 @@ module.exports = {
         res.json({
           data: {
             message: 'Profile updated successfully',
+          },
+        });
+      } catch (err) {
+        logger.error(err);
+        res.status(500).json({
+          message: err.message || 'Some error occurred',
+        });
+      }
+    },
+    syncTelegramAvatar: async (req, res) => {
+      try {
+        const userId = req.user?.id;
+
+        const user = await db.user.findByPk(userId);
+        if (!user) {
+          res.status(404).send({
+            message: 'User not found',
+          });
+          return;
+        }
+
+        const avatarUrl = await getTelegramUserAvatar(user.telegramId);
+
+        if (avatarUrl) {
+          await user.update({
+            avatar: avatarUrl,
+          });
+        }
+
+        res.json({
+          data: {
+            message: 'Telegram Avatar synced successfully',
           },
         });
       } catch (err) {

@@ -56,5 +56,6 @@ module.exports = {
         .escape(),
       validateRules,
     ],
+    syncTelegramAvatar: [],
   },
 };

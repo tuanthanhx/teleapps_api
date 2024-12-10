@@ -126,6 +126,7 @@ exports.getTelegramUserAvatar = async (telegramId) => {
     return null;
   } catch (error) {
     console.error(`Error fetching Telegram user avatar (Telegram ID: ${telegramId}):`, error.message);
+    return null;
   }
 };
 

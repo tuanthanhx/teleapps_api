@@ -1,77 +1,110 @@
 const Redis = require('ioredis');
-const logger = require('./logger');
+// const logger = require('./logger');
 
 require('dotenv').config();
 
+let redisClient;
 const redisDbIndex = process.env.NODE_ENV === 'production' ? 1 : 0; // Use DB 1 for production, DB 0 for others
 
-const redisConfig = {
-  host: process.env.REDIS_HOST || '127.0.0.1',
-  port: process.env.REDIS_PORT || 6379,
-  password: process.env.REDIS_PASSWORD || null,
-  db: redisDbIndex,
-  // reconnectOnError: (err) => {
-  //   logger.error('Redis connection error:', err);
-  //   return true;
-  // },
-};
-
-// Initialize Redis client
-const redisClient = new Redis(redisConfig);
-
-/*
-// Event listeners for monitoring Redis connection
-redisClient.on('connect', () => {
-  logger.info(`Connected to Redis (DB ${redisDbIndex}) successfully`);
-});
-
-redisClient.on('error', (err) => {
-  logger.error('Redis connection error:', err.message || err);
-});
-
-redisClient.on('reconnecting', () => {
-  logger.info('Reconnecting to Redis...');
-});
-
-redisClient.on('end', () => {
-  logger.info('Redis connection closed');
-});
-*/
-
-// Helper to set a key with an optional expiration
-const setCache = async (key, value, expiration = 3600) => {
+async function initializeRedis () {
   try {
-    await redisClient.set(key, JSON.stringify(value), 'EX', expiration);
-    if (process.env.NODE_ENV === 'development') console.log('>> Cache Set');
-  } catch (error) {
-    logger.error('Error setting cache:', error.message || error);
+    if (!(process.env.REDIS_ENABLED === 'true')) {
+      redisClient = null;
+      return;
+    }
+
+    redisClient = new Redis({
+      host: process.env.REDIS_HOST || '127.0.0.1',
+      port: process.env.REDIS_PORT || 6379,
+      password: process.env.REDIS_PASSWORD || null,
+      db: redisDbIndex,
+      retryStrategy (times) {
+        console.error(`Redis reconnect attempt #${times}`);
+        return null;
+      },
+    });
+
+    redisClient.on('connect', () => {
+      console.log('Connected to Redis');
+    });
+
+    redisClient.on('error', (err) => {
+      console.error('Redis error:', err);
+    });
+
+    redisClient.on('close', () => {
+      console.warn('Redis connection closed.');
+      redisClient = null;
+    });
+
+    // Test connection
+    // await redisClient.ping();
+    // console.log('Redis connection successful');
+  } catch (err) {
+    console.error('Failed to connect to Redis:', err);
+    redisClient = null;
   }
-};
+}
 
-// Helper to get a key
-const getCache = async (key) => {
+initializeRedis();
+
+async function setCache (key, value, ttl = 3600) {
+  if (!redisClient) {
+    console.warn('Redis client not initialized. Skipping cache set.');
+    return;
+  }
   try {
-    const value = await redisClient.get(key);
-    if (value && process.env.NODE_ENV === 'development') console.log('>> Cache Hit');
-    return value ? JSON.parse(value) : null;
-  } catch (error) {
-    logger.error('Error getting cache:', error.message || error);
+    const stringValue = JSON.stringify(value);
+    await redisClient.set(key, stringValue, 'EX', ttl); // Use EX for TTL
+    console.info('Cache set.');
+  } catch (err) {
+    console.error('Error setting cache:', err);
+  }
+}
+
+async function getCache (key) {
+  if (!redisClient) {
+    console.warn('Redis client not initialized. Skipping cache get.');
     return null;
   }
-};
+  try {
+    const data = await redisClient.get(key);
+    console.info('Cache get.');
+    return data ? JSON.parse(data) : null;
+  } catch (err) {
+    console.error('Error getting cache:', err);
+    return null;
+  }
+}
 
-// Helper to delete a key
-const delCache = async (key) => {
+async function deleteCache (key) {
+  if (!redisClient) {
+    console.warn('Redis client not initialized. Skipping cache delete.');
+    return;
+  }
   try {
     await redisClient.del(key);
-  } catch (error) {
-    logger.error('Error deleting cache:', error.message || error);
+    console.info('Cache deleted.');
+  } catch (err) {
+    console.error('Error deleting cache:', err);
   }
-};
+}
+
+async function clearCache () {
+  if (!redisClient) {
+    console.warn('Redis client not initialized. Skipping cache clear.');
+    return;
+  }
+  try {
+    await redisClient.flushall();
+  } catch (err) {
+    console.error('Error clearing cache:', err);
+  }
+}
 
 module.exports = {
-  redisClient,
   setCache,
   getCache,
-  delCache,
+  deleteCache,
+  clearCache,
 };

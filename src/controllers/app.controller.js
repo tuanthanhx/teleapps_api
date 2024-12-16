@@ -1,6 +1,6 @@
 const slugify = require('slugify');
 const appService = require('../services/app.service');
-const redis = require('../utils/redis');
+// const redis = require('../utils/redis');
 const logger = require('../utils/logger');
 const { APP_STATUS } = require('../constants/app_status.constants');
 const { APP_PLATFORMS } = require('../constants/app_platform.constants');
@@ -105,6 +105,7 @@ module.exports = {
         }
 
         // Generate a dynamic cache key
+        /*
         const cacheKey = `apps:${JSON.stringify({
           keyword, categoryId, categorySlug, status, page, limit, sortField, sortOrder, path: req.originalUrl,
         })}`;
@@ -115,6 +116,7 @@ module.exports = {
           res.json(cachedApps);
           return;
         }
+        */
 
         const data = await db.app.findAndCountAll(queryOptions);
         const { count, rows } = data;
@@ -147,7 +149,7 @@ module.exports = {
           };
 
         // Cache the response
-        await redis.setCache(cacheKey, response, 3600); // Cache for 1 hour
+        // await redis.setCache(cacheKey, response, 3600); // Cache for 1 hour
 
         res.json(response);
       } catch (err) {

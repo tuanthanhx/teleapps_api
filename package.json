@@ -1,7 +1,7 @@
 {
   "name": "teleapps_api",
   "version": "1.0.0",
-  "description": "Teleapps API",
+  "description": "TeleApps API",
   "private": true,
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon server.js",

@@ -203,6 +203,7 @@ module.exports = {
         if (task.type === 'play_game') {
           const taskData = tryParseJSON(task.data);
           const { count: requiredCount } = taskData;
+          const todayStart = dayjs().startOf('day').toDate();
 
           const gameCount = await db.game_session.count({
             where: {
@@ -210,6 +211,7 @@ module.exports = {
               ...(latestUserTask && {
                 createdAt: {
                   [Op.gt]: latestUserTask.createdAt,
+                  [Op.gte]: todayStart,
                 },
               }),
             },
@@ -295,6 +297,7 @@ module.exports = {
       }
     },
 
+    /*
     start: async (req, res) => {
       try {
         const userId = req.user?.id;
@@ -484,6 +487,7 @@ module.exports = {
         });
       }
     },
+    */
   },
   admin: {
     // index: async (req, res) => module.exports.common.index(req, res),

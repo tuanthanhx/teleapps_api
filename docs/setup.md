@@ -6,21 +6,18 @@ OR
 
 cd src
 
-NODE_ENV=production npx sequelize db:seed --seed 20240901000001-add_users.js
+#== OLD (TESTING)
+
 NODE_ENV=production npx sequelize db:seed --seed 20240901000002-add_apps.js
 NODE_ENV=production npx sequelize db:seed --seed 20240901000003-add_app_categories.js
 NODE_ENV=production npx sequelize db:seed --seed 20240901000004-add_app_category_map.js
-NODE_ENV=production npx sequelize db:seed --seed 20240901000005-add_app_covers.js
-NODE_ENV=production npx sequelize db:seed --seed 20240901000007-add_app_languages.js
-# NODE_ENV=production npx sequelize db:seed --seed 20240901000008-add_app_reviews.js -- ONLY FOR TESTING
-NODE_ENV=production npx sequelize db:seed --seed 20240901000009-add_sliders.js
-NODE_ENV=production npx sequelize db:seed --seed 20240901000010-add_slider_items.js
-NODE_ENV=production npx sequelize db:seed --seed 20240901000011-add_app_category_slider_items.js
-NODE_ENV=production npx sequelize db:seed --seed 20241026000015-add_wallets.js
-NODE_ENV=production npx sequelize db:seed --seed 20241026000020-add_task_categories.js
-NODE_ENV=production npx sequelize db:seed --seed 20241026000030-add_tasks.js
+NODE_ENV=production npx sequelize db:seed --seed 20240901000008-add_app_reviews.js # -- ONLY FOR TESTING
 
-# ===
+#== 20250111
+
+NODE_ENV=production npx sequelize db:seed --seed 20240901000001-add_users.js
+NODE_ENV=production npx sequelize db:seed --seed 20241026000015-add_wallets.js
+NODE_ENV=production npx sequelize db:seed --seed 20240901000007-add_app_languages.js
 
 NODE_ENV=production npx sequelize db:seed --seed 20240901000003-add_app_categories.js
 
@@ -53,6 +50,7 @@ NODE_ENV=production npx sequelize db:seed --seed 20240901000011-add_app_category
 
 NODE_ENV=production npx sequelize db:seed --seed 20241026000020-add_task_categories.js
 NODE_ENV=production npx sequelize db:seed --seed 20241026000030-add_tasks.js
+
 
 # MIGRATION
 
